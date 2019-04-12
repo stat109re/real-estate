@@ -1,0 +1,282 @@
+---
+title: "RE Project Notes RS"
+author: "Ravi Sharma"
+date: "April 3, 2019"
+output: pdf_document
+---
+
+Load package for working with Excel files
+```{r}
+library(xlsx)
+```
+
+Load listing data
+```{r}
+listing <- read.xlsx("HES_TEMPLATES_v2.xlsx", 1)
+
+dim(listing)
+```
+
+Load economy data
+```{r}
+economy <- read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 2, startRow = 1, endRow = 382)
+
+dim(economy)
+
+```
+
+Header records:
+```{r}
+head(listing)
+```
+
+```{r}
+tail(economy)
+```
+
+## As discussed in the group (...add details), to consider a subset comprising of top 100 ranking city areas, a smaller dataset is created:
+```{r}
+listing100 <- data.frame(listing[1:100,])
+dim(listing100)
+```
+
+
+## Summary of variables in Listings (top 100 ranks subset of data):
+### To begin with, list all variables:
+```{r}
+names(listing)
+#summary(listing)
+```
+### 04. Regions represented in the data:
+Summary table:
+```{r}
+summary(listing100$Region)
+```
+Visual:
+```{r}
+barplot(table(listing100$Region), main = "Regions in top 100 listing centers", xlab="Regions")
+```
+
+Comments:
+
+
+### 05. Median.Listing.Price.Yy change:
+Summary table:
+```{r}
+summary(listing100$Avg..Median.Listing.Price.Yy)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg..Median.Listing.Price.Yy)
+```
+
+
+### 06. Active.Listing.Count.Yy change:
+Summary table:
+```{r}
+summary(listing100$Avg..Active.Listing.Count.Yy)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg..Active.Listing.Count.Yy)
+```
+
+### 07. Ldpviews.Per.Property.Yy change:
+Summary table:
+```{r}
+summary(listing100$Avg..Ldpviews.Per.Property.Yy)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg..Ldpviews.Per.Property.Yy)
+```
+
+
+### 08. Median.Dom.Yy change:
+Summary table:
+```{r}
+summary(listing100$Avg..Median.Dom.Yy)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg..Median.Dom.Yy)
+```
+
+### 09. Median.Listing.Price :
+Summary table:
+```{r}
+summary(listing100$Avg..Median.Listing.Price)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg..Median.Listing.Price)
+```
+
+
+### 10. Active.Listing.Count :
+Summary table:
+```{r}
+summary(listing100$Avg..Active.Listing.Count)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg..Active.Listing.Count)
+```
+
+
+### 11. Ldpviews.Per.Property :
+Summary table:
+```{r}
+summary(listing100$Avg..Ldpviews.Per.Property)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg..Ldpviews.Per.Property)
+```
+
+
+### 12. Median.Dom :
+Summary table:
+```{r}
+summary(listing100$Avg..Median.Dom)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg..Median.Dom)
+```
+
+
+### 13. ActiveListingsper1000HH :
+Summary table:
+```{r}
+summary(listing100$Avg.ActiveListingsper1000HH)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg.ActiveListingsper1000HH)
+```
+
+
+
+
+## Try regression with everything in:
+```{r}
+fit1 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH , data=listing100)
+
+summary(fit1)
+```
+
+### load script for stepwise regression:
+```{r}
+source("http://people.fas.harvard.edu/~mparzen/stat100/model_select.txt")
+```
+
+### Now run stepwise regression:
+```{r}
+model.select(fit1, verbose = FALSE)
+```
+
+
+## Let us also include the categorical variable region to list of predictors:
+```{r}
+fit2 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH + factor(Region) , data=listing100)
+
+summary(fit2)
+```
+
+### Now run stepwise regression again:
+```{r}
+model.select(fit2, verbose = FALSE)
+```
+
+
+## Let us look at one-to-one relationship between Y and X and between Xs:
+```{r}
+pairs(listing100[,5:13])
+```
+
+## Now let us look at the suggested predictors individually, in detail:
+
+### 
+```{r}
+fit3 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy, data=listing100)
+
+summary(fit3)
+```
+Scatterplot and regression line
+```{r}
+plot(listing100$Avg..Active.Listing.Count.Yy, listing100$Avg..Median.Listing.Price.Yy)
+abline(fit3, col="orange", lwd=3)
+```
+
+The plot is somewhat convincing. Let us look for influential points
+```{r}
+plot(fit3,4)
+```
+
+Let us list the two longest on Cook's distance:
+```{r}
+listing100[c(31,89),1:4]
+```
+
+Let us remove those two:
+```{r}
+listing98<-listing100[!(listing100$RankHH == 31 | listing100$RankHH == 89),]
+dim(listing98)
+```
+
+And now run the regression again:
+```{r}
+fit4 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy, data=listing98)
+
+summary(fit4)
+```
+Slightly improved Adjusted R-squared, residual standard error reduces slightly. Let us see the plots again:
+```{r}
+plot(listing98$Avg..Active.Listing.Count.Yy, listing98$Avg..Median.Listing.Price.Yy)
+abline(fit3, col="orange", lwd=3)
+```
+
+
+
+### Let us get economy data into the mix:
+## First let us create the combined dataset:
+```{r}
+listing_eco_98 <- merge(listing98, economy, by="RankHH")
+dim(listing_eco_98)
+```
+
+## we now have a long list of columns. Here is the list:
+```{r}
+names(listing_eco_98)
+```
+
+## Again, here is an attempt to run regression with everything from economy, but only the surviving columns of listing data
+```{r}
+fit5 <- lm(formula = Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + 
+    Avg..Median.Dom + factor(Region.x) + 
+End.Of.2016.Household + End.Of.2017.Household + End.Of.2016.Job + End.Of.2017.Job + Income.2017 + Income.2016 + Unemployment.Rate.2017 + Unemployment.Rate.2016 + Buy.Pct.2017 + Buy.Pct.2016 + HH_yoy + JOB_yoy + INC_yoy + UNEMP_yoy + BUYPCT_yoy + Home.Ownership.2017 + OwnOccHH2017 + Sale.Px.Recovery + Sale.Price.Yoy + Sale.Px.Recovery..Msa1. + Sale.Price.Yoy..Msa1. + Total.Starts + Total.Starts.Recovery + Total.Starts.Yoy  
+ + Total.Starts..Msa1. + Total.Starts.Recovery..Msa1. + Total.Starts.Yoy..Msa1., data = listing_eco_98)
+
+summary(fit5)
+```
+
+
+## Running stepwise regression:
+```{r}
+model.select(fit5, verbose = FALSE)
+
+```
+
+... we are pointed to 8 variables.
+
+Running regression once again, with those 8 and storing the results this time
+```{r}
+fit6 <- lm(formula = Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + 
+    End.Of.2016.Household + End.Of.2017.Household + Income.2017 + 
+    Unemployment.Rate.2017 + INC_yoy + BUYPCT_yoy + Sale.Price.Yoy..Msa1., 
+    data = listing_eco_98)
+
+summary(fit6)
+```
+
