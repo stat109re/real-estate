@@ -1,0 +1,122 @@
+---
+title: "EDA Real Estate"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+```{r}
+# Load Data
+library(xlsx)
+listing = read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 1)
+economy = read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 2, startRow = 1, endRow = 382)
+```
+
+
+```{r}
+# column names for economy dataset
+colnames(economy)
+```
+
+```{r}
+# column names for listing dataset
+colnames(listing)
+```
+```{r}
+head(listing)
+```
+
+
+
+
+```{r}
+# Fit a linear regression model on all variables in listing
+fit_all <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH + factor(Region), data=listing)
+summary(fit_all)
+```
+
+Only Avg..Active.Listing.Count.Yy is statistically significant in top 50, therefore using `listings`.
+
+
+```{r}
+# compute VIF, and remove variables if VIF > 5 since they have a problem estimating
+library(car)
+vif(fit_all)
+```
+
+From above, we can see that all the values do not have a problem estimating the coefficients, hence we can keep the existing variables. 
+
+
+```{r}
+# Trying Stepwise Regression with all variables
+source("http://people.fas.harvard.edu/~mparzen/stat100/model_select.txt")
+model.select(fit_all, verbose = FALSE)
+```
+
+Stepwise Regression results in Avg..Active.Listing.Count.Yy in using top 50
+
+in using all
+Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Listing.Price +  Avg..Median.Dom + factor(Region) 
+
+lm(formula = Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + 
+    Avg..Ldpviews.Per.Property.Yy + Avg..Median.Listing.Price + 
+    Avg..Median.Dom + factor(Region)
+
+
+
+```{r}
+# fit the model with the stepwise results
+fit_stepwise_res <- lm(formula = Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Listing.Price + Avg..Median.Dom + factor(Region), data=listing)
+summary(fit_stepwise_res)
+```
+
+
+```{r}
+# just confirming stepwise results here
+model.select(fit_stepwise_res, verbose = FALSE)
+```
+
+
+```{r}
+# merge stepwise results with economy dataset
+vars <- c("Avg..Median.Listing.Price.Yy", "Avg..Active.Listing.Count.Yy", "Avg..Ldpviews.Per.Property.Yy", "Avg..Median.Listing.Price", "Avg..Median.Dom", "RankHH")
+stepwise_listing_df <- listing[vars]
+listing_economy <- merge(stepwise_listing_df, economy, by="RankHH")
+colnames(listing_economy)
+```
+
+
+```{r}
+# run merged results
+merge_stepwise_fit <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Median.Listing.Price.Yy + + Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Listing.Price + Avg..Median.Dom + factor(Region) + Sale.Px.Recovery + Sale.Price.Yoy, data=listing_economy)
+summary(merge_stepwise_fit)
+```
+
+```{r, warning = FALSE}
+model.select(merge_stepwise_fit, verbose = FALSE)
+```
+
+
+
+Running Alternative Tests
+
+```{r}
+# Load Data
+library(xlsx)
+listing = read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 1)
+economy = read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 2, startRow = 1, endRow = 382)
+
+listing_economy = merge(listing, economy, by="RankHH")
+colnames(listing_economy)
+```
+
+
+```{r}
+boxplot(listing_economy$Avg..Median.Listing.Price.Yy, main="Avg..Median.Listing.Price.Yy")
+boxplot(listing_economy$Avg..Active.Listing.Count.Yy, main="Avg..Active.Listing.Count.Yy")
+boxplot(listing_economy$Avg..Ldpviews.Per.Property.Yy, main="Avg..Ldpviews.Per.Property.Yy")
+boxplot(listing_economy$Avg..Median.Dom.Yy, main="Avg..Median.Dom.Yy")
+
+```
+
+
