@@ -1,0 +1,361 @@
+---
+title: "RE Project STAT109"
+author: "Javier Vivas"
+date: "5/1/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+
+
+##install.packages("dplyr", dependencies = TRUE)
+#install.packages("BHH2", dependencies = TRUE)
+#install.packages("BSDA", dependencies = TRUE)
+#install.packages("nortest", dependencies = TRUE)
+#install.packages("car", dependencies = TRUE)
+#install.packages("lmtest", dependencies = TRUE)
+#install.packages("MASS", dependencies = TRUE)
+#install.packages("R330", dependencies = TRUE)
+
+
+
+library(seasonal)
+library(seasonalview)
+library(xlsx)
+library(forecast)
+library(ggplot2)
+library(tseries)
+library(ggcorrplot)
+library(BiplotGUI)
+
+library(BHH2)
+library(BSDA)
+library(nortest)
+library(car)
+library(lmtest)
+library(MASS)
+library(R330)
+library(reshape2)
+#library(auto)
+
+### START JV Models ###
+
+#1. Load, Merge and Filter data
+
+listing <- read.xlsx("HES_TEMPLATES_v2.xlsx", 1)
+economy <- read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 2, startRow = 1, endRow = 382)
+
+#remove labels from economic data
+economy<-economy[,-c(2:5) ]
+
+#merge
+listing_eco <- merge(listing, economy, by="RankHH")
+
+#View(listing_eco)
+names(economy)
+#View(economy[,5:31])
+
+#Subset data to include largest 100 MSAs only
+mydata=data.frame(listing_eco[1:100,])
+View(mydata)
+
+
+#2. Run descriptive stats
+
+#explore distribution of response variable
+# a few high and low outliers
+boxplot(mydata$Avg..Median.Listing.Price.Yy , 
+     ylab = "Avg..Median.Listing.Price.Yy",
+        main = "Test BoxPlot"
+)
+
+#explore distribution of response variable by region
+#the Midwest region seems to have particularly higher price growth
+boxplot(Avg..Median.Listing.Price.Yy ~Region, data=mydata,
+        ylab = "Avg..Median.Listing.Price.Yy",
+        main = "Test BoxPlot"
+)
+
+#explore correlations 
+
+pairs(mydata[,-c(1:4) ])
+
+matrix<-cor(mydata[,-c(1:4) ])
+
+View(matrix)
+
+plot(matrix)
+
+#export to excel
+#write.xlsx(matrix, "matrix.xlsx")
+
+
+# Create a correlation heatmap
+
+cormat <- round(cor(mydata[,-c(1:4) ]),2)
+melted_cormat <- melt(cormat)
+head(melted_cormat)
+
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + 
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+      geom_tile()
+
+#Get triangles and melt again
+
+# Get lower triangle of the correlation matrix
+get_lower_tri<-function(cormat){
+   cormat[upper.tri(cormat)] <- NA
+   return(cormat)
+}
+# Get upper triangle of the correlation matrix
+get_upper_tri <- function(cormat){
+   cormat[lower.tri(cormat)]<- NA
+   return(cormat)
+}
+
+
+upper_tri <- get_upper_tri(cormat)
+upper_tri
+
+
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+# Heatmap
+ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+   geom_tile(color = "white")+
+   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                        midpoint = 0, limit = c(-1,1), space = "Lab", 
+                        name="Pearson\nCorrelation") +
+   theme_minimal()+ 
+   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                    size = 12, hjust = 1))+
+   coord_fixed()
+
+
+#reorder correlation matrix
+reorder_cormat <- function(cormat){
+   # Use correlation between variables as distance
+   dd <- as.dist((1-cormat)/2)
+   hc <- hclust(dd)
+   cormat <-cormat[hc$order, hc$order]
+}
+
+cormat <- reorder_cormat(cormat)
+upper_tri <- get_upper_tri(cormat)
+# Melt the correlation matrix
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+# Create a ggheatmap
+ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value))+
+   geom_tile(color = "white")+
+   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                        midpoint = 0, limit = c(-1,1), space = "Lab", 
+                        name="Pearson\nCorrelation") +
+   theme_minimal()+ # minimal theme
+   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                    size = 12, hjust = 1))+
+   coord_fixed()
+# Print the heatmap
+print(ggheatmap)
+
+
+#add correlation coefficients on heatmap
+ggheatmap + 
+   geom_text(aes(Var2, Var1, label = value), color = "black", size = 4) +
+   theme(
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.border = element_blank(),
+      panel.background = element_blank(),
+      axis.ticks = element_blank(),
+      legend.justification = c(1, 0),
+      legend.position = c(0.6, 0.7),
+      legend.direction = "horizontal")+
+   guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+                                title.position = "top", title.hjust = 0.5))
+
+
+
+#test normalizing response
+#didn't need this since prof suggested shifting response values
+#x<-mydata$Avg..Median.Listing.Price.Yy
+#scores <- pnorm(x,mean(x),sd(x))
+#mydata_scores<- cbind(mydata,scores)
+#mydata_scores<-mydata
+#View(mydata)
+#names(mydata_scores)
+
+
+#Filter data based on initial findings
+
+#remove labels
+mydata<-mydata[,-c(1:3) ]
+
+#remove bad explanatory variables based on known multicollinearity and data coverage issues
+mydata<-mydata[,-c(6,13,14,16,18,24,27:36) ]
+
+#remove bad rows based on known issues
+mydata<-mydata[-c(1,89), ]
+
+#shift response values up 0.03 to allow allpossregs to run (based on prof Parzen suggestion)
+mydata$Avg..Median.Listing.Price.Yy=mydata$Avg..Median.Listing.Price.Yy+0.03
+
+
+
+#Run AllPossRegs
+
+#model response against all selected predictors
+fit3=allpossregs(Avg..Median.Listing.Price.Yy~.
+                 ,data=mydata,best=3)   
+
+#model response against all selected predictors and their interactions
+#NOTE: this was too processing intensive and didn't run
+#fit4=allpossregs(Avg..Median.Listing.Price.Yy~.*.
+#                ,data=mydata,best=1, really.big=TRUE, nvmax=10)
+
+
+#plot(fit3)
+View(fit3)
+
+#Export model list to excel
+models<-fit3
+write.xlsx(models, "models2.xlsx")
+
+
+
+#Pick ONE model from allpossregs based on Adj R squared
+# Adj R Squared 0.4905
+
+fit=lm(Avg..Median.Listing.Price.Yy ~ 
+          
+          +Avg..Active.Listing.Count.Yy
+       +Avg..Ldpviews.Per.Property
+       + Avg.ActiveListingsper1000HH
+       + HH_yoy
+       +JOB_yoy
+       +INC_yoy
+       
+       +Region
+       
+       , data=mydata)
+
+summary(fit)
+
+plot(predict(fit), mydata$Avg..Median.Listing.Price.Yy)
+
+x<-data.frame(predict(fit), mydata$Avg..Median.Listing.Price.Yy, abs(predict(fit)- mydata$Avg..Median.Listing.Price.Yy))
+
+x
+
+#write.xlsx(mydata, "mydata.xlsx")
+
+
+#Run diagnosis again on ONE chosen model
+
+# do we need transformations?
+# high p value well above 0.05 means model OK, no transformations needed
+resettest(fit)
+
+#multicollinearity?
+# All VIFs below 10 means model OK, no significant multicollinearity
+vif(fit)
+
+#normality?
+#High p-value from the shapiro test is above 0.1 so
+#we fail to reject the null hypo that we have a
+#normal distribution and we are OK
+shapiro.test(resid(fit))
+
+#constant variance?
+#High p-value means no issues
+ncvTest(fit)
+ncvTest(fit)$p
+
+#influential points?
+#some points above Cook threshold, consider removal
+plot(fit, which=4)
+cooks.distance(fit)>4 / length(cooks.distance(fit))
+
+### END JV Models ###
+
+#More diagnosis template
+
+#Check for linearity and non-constant variance
+
+#residuals v fitted
+plot(fit,which=4) 
+plot(fitted(fit), resid(fit), col = "grey", pch = 20,
+     xlab = "Fitted", ylab = "Residuals", main = "Data from Model 1")
+abline(h = 0, col = "darkorange", lwd = 2)
+
+#this is confirmed when plotting studentized residuals:
+#same points observed outside the interval -2 to 2
+plot(fitted(fit),rstudent(fit))
+rstudent(fit)
+rstudent(fit)[abs(rstudent(fit)) > 2]
+
+#qqplot
+qqnorm(resid(fit), main = "Normal Q-Q Plot, fit", col = "darkgrey")
+qqline(resid(fit), col = "dodgerblue", lwd = 2)
+
+#p-value from the shapiro test is above 0.1 so
+#we fail to reject the null hypo that we have a
+#normal distribution
+shapiro.test(resid(fit))
+
+plot(fit, which=4)
+cooks.distance(fit)>4 / length(cooks.distance(fit))
+
+cooks.distance(fit)[89] 
+   
+
+qqPlot(rstudent(fit))
+hist(rstudent(fit))
+
+hist(resid(fit),
+     xlab   = "Residuals",
+     main   = "Histogram of Residuals, fit",
+     col    = "darkorange",
+     border = "dodgerblue",
+     breaks = 7)
+
+
+# do we need transformations?
+#high p value means model OK
+resettest(fit)
+
+#multicollinearity?
+vif(fit)
+
+#backward stepwise regression
+stepAIC(fit,direction=c("backward"),trace=1)
+summary(fit2)
+
+
+```
+
