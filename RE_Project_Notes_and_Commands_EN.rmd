@@ -1,16 +1,20 @@
 ---
 title: "RE Project Notes RS"
-author: "Ravi Sharma"
+author: "Evgeny Nenashev"
 date: "April 3, 2019"
 output: pdf_document
 ---
 
+### Based on the initial commit of Ravi Sharma
+### 
 Load package for working with Excel files
+
 ```{r}
 library(xlsx)
 ```
 
 Load listing data
+
 ```{r}
 listing <- read.xlsx("HES_TEMPLATES_v2.xlsx", 1)
 
@@ -18,6 +22,7 @@ dim(listing)
 ```
 
 Load economy data
+
 ```{r}
 economy <- read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 2, startRow = 1, endRow = 382)
 
@@ -26,6 +31,7 @@ dim(economy)
 ```
 
 Header records:
+
 ```{r}
 head(listing)
 ```
@@ -45,9 +51,11 @@ dim(listing100)
 ### To begin with, list all variables:
 ```{r}
 names(listing)
-#summary(listing)
+summary(listing)
 ```
+
 ### 04. Regions represented in the data:
+
 Summary table:
 ```{r}
 summary(listing100$Region)
@@ -160,44 +168,43 @@ boxplot(listing100$Avg.ActiveListingsper1000HH)
 
 
 ## Try regression with everything in:
-```{r}
-fit1 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH , data=listing100)
 
-summary(fit1)
-```
+#```{r}
+#fit1 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy #+ Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + #Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH , data=listing100)
+#
+#summary(fit1)
+#```
+
+### Try regression with everything in:
 ### The same in a bit more compact way
+
+Fit on listing data only (no economy data)
+
 ```{r}
-head(listing100)
+#head(listing100)
+### Removing Cbsacode and Cbsatitle
 listing100_n=listing100[,c(-2,-3)]
+### Keeping RankHH for subsequent merge
+### NO region at all
 fit1_n=lm(Avg..Median.Listing.Price.Yy~ . -Region -RankHH ,data=listing100_n)
 summary(fit1_n)
 ```
-### load script for stepwise regression:
+
+### NO VIF above 10
+
 ```{r}
-source("http://people.fas.harvard.edu/~mparzen/stat100/model_select.txt")
+#install.packages("car")
+library(car)
+vif(fit1_n)
 ```
 
-### Now run stepwise regression:
-```{r}
-model.select(fit1, verbose = FALSE)
-```
 
-
-
-## Let us also include the categorical variable region to list of predictors:
-```{r}
-fit2 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH + factor(Region) , data=listing100)
-
-summary(fit2)
-```
+### Let us also include the categorical variable region to list of predictors:
 ### The same in a bit more compact way
 ```{r}
 fit2_n=lm(Avg..Median.Listing.Price.Yy~ . -Region + factor(Region) -RankHH,data=listing100_n)
 summary(fit2_n)
-```
-### Now run stepwise regression again:
-```{r}
-model.select(fit2, verbose = FALSE)
+vif(fit2_n)
 ```
 
 
@@ -207,61 +214,62 @@ pairs(listing100[,5:13])
 ```
 
 ## Now let us look at the suggested predictors individually, in detail:
+#
+#### 
+#```{r}
+#fit3 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy, data=listing100)
+#
+#summary(fit3)
+#```
+#Scatterplot and regression line
+#```{r}
+#plot(listing100$Avg..Active.Listing.Count.Yy, listing100$Avg..Median.Listing.Price.Yy)
+#abline(fit3, col="orange", lwd=3)
+#```
+#
+#The plot is somewhat convincing. Let us look for influential points
+#```{r}
+#plot(fit3,4)
+#```
+#
+#Let us list the two longest on Cook's distance:
+#```{r}
+#listing100[c(31,89),1:4]
+#```
+#
+#Let us remove those two:
+#```{r}
+#listing98<-listing100[!(listing100$RankHH == 31 | listing100$RankHH == 89),]
+#
+#dim(listing98)
+#```
 
-### 
-```{r}
-fit3 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy, data=listing100)
-
-summary(fit3)
-```
-Scatterplot and regression line
-```{r}
-plot(listing100$Avg..Active.Listing.Count.Yy, listing100$Avg..Median.Listing.Price.Yy)
-abline(fit3, col="orange", lwd=3)
-```
-
-The plot is somewhat convincing. Let us look for influential points
-```{r}
-plot(fit3,4)
-```
-
-Let us list the two longest on Cook's distance:
-```{r}
-listing100[c(31,89),1:4]
-```
-
-Let us remove those two:
-```{r}
-listing98<-listing100[!(listing100$RankHH == 31 | listing100$RankHH == 89),]
-
-dim(listing98)
-```
 ### The same with less typing
 ```{r}
 listing98_n=listing100_n[c(-31,-89),]
 dim(listing98_n)
 ```
 
-And now run the regression again:
-```{r}
-fit4 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy, data=listing98)
-
-summary(fit4)
-```
-Slightly improved Adjusted R-squared, residual standard error reduces slightly. Let us see the plots again:
-```{r}
-plot(listing98$Avg..Active.Listing.Count.Yy, listing98$Avg..Median.Listing.Price.Yy)
-abline(fit3, col="orange", lwd=3)
-```
+#And now run the regression again:
+#```{r}
+#fit4 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy, data=listing98)
+#
+#summary(fit4)
+#```
+#Slightly improved Adjusted R-squared, residual standard error reduces slightly. Let us see the plots #again:
+#```{r}
+#plot(listing98$Avg..Active.Listing.Count.Yy, listing98$Avg..Median.Listing.Price.Yy)
+#abline(fit3, col="orange", lwd=3)
+#```
 
 
 
 ### Let us get economy data into the mix:
 ## First let us create the combined dataset:
-```{r}
-listing_eco_98 <- merge(listing98, economy, by="RankHH")
-dim(listing_eco_98)
-```
+#```{r}
+#listing_eco_98 <- merge(listing98, economy, by="RankHH")
+#dim(listing_eco_98)
+#```
 ```{r}
 listing_eco_98_n <- merge(listing98_n, economy, by="RankHH")
 listing_eco_98_n=listing_eco_98_n[,c(-12,-13)]
@@ -270,45 +278,126 @@ names(listing_eco_98_n)
 ```
 
 ## we now have a long list of columns. Here is the list:
-```{r}
-names(listing_eco_98)
-```
+#```{r}
+#names(listing_eco_98)
+#```
 
 ## Again, here is an attempt to run regression with everything from economy, but only the surviving columns of listing data
-```{r}
-fit5 <- lm(formula = Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + 
-    Avg..Median.Dom + factor(Region.x) + 
-End.Of.2016.Household + End.Of.2017.Household + End.Of.2016.Job + End.Of.2017.Job + Income.2017 + Income.2016 + Unemployment.Rate.2017 + Unemployment.Rate.2016 + Buy.Pct.2017 + Buy.Pct.2016 + HH_yoy + JOB_yoy + INC_yoy + UNEMP_yoy + BUYPCT_yoy + Home.Ownership.2017 + OwnOccHH2017 + Sale.Px.Recovery + Sale.Price.Yoy + Sale.Px.Recovery..Msa1. + Sale.Price.Yoy..Msa1. + Total.Starts + Total.Starts.Recovery + Total.Starts.Yoy  
- + Total.Starts..Msa1. + Total.Starts.Recovery..Msa1. + Total.Starts.Yoy..Msa1., data = listing_eco_98)
-
-summary(fit5)
-```
-
-### 
 #```{r}
-#head(listing_eco_98_n)
-#names(listing_eco_98_n)
-#fit5_n=lm(Avg..Median.Listing.Price.Yy~ . -RankHH -Region.x +factor(Region.x) 
-#,data=listing_eco_98_n)
-#summary(fit5_n)
+#fit5 <- lm(formula = Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + 
+#    Avg..Median.Dom + factor(Region.x) + 
+#End.Of.2016.Household + End.Of.2017.Household + End.Of.2016.Job + End.Of.2017.Job + Income.2017 + #Income.2016 + Unemployment.Rate.2017 + Unemployment.Rate.2016 + Buy.Pct.2017 + Buy.Pct.2016 + HH_yoy + #JOB_yoy + INC_yoy + UNEMP_yoy + BUYPCT_yoy + Home.Ownership.2017 + OwnOccHH2017 + Sale.Px.Recovery + #Sale.Price.Yoy + Sale.Px.Recovery..Msa1. + Sale.Price.Yoy..Msa1. + Total.Starts + Total.Starts.Recovery #+ Total.Starts.Yoy  
+# + Total.Starts..Msa1. + Total.Starts.Recovery..Msa1. + Total.Starts.Yoy..Msa1., data = listing_eco_98)
+#
+#summary(fit5)
 #```
 
 
-## Running stepwise regression:
+###Lets remember we removed factor(Region.x)
+### 
 ```{r}
-model.select(fit5, verbose = FALSE)
+head(listing_eco_98_n)
+listing_eco_98_n[1,]
+names(listing_eco_98_n)
+fit5_n=lm(Avg..Median.Listing.Price.Yy~ . -RankHH -Region.x 
+          #+factor(Region.x)
+,data=listing_eco_98_n)
+summary(fit5_n)
+vif(fit5_n)
+
+#pairs(listing_eco_98_n[,3:7])
+#pairs(listing_eco_98_n[,8:12])
+```
+
+### Technically at this point there is no VIF higher than 10, there are some close to it though
+### Removing High VIFs
+#```{r}
+#fit5_n=lm(Avg..Median.Listing.Price.Yy~ . -RankHH -Region.x -End.Of.2017.Household -End.Of.2017.Job #-Income.2017 -Unemployment.Rate.2017 -Buy.Pct.2017
+#          -End.Of.2016.Household -End.Of.2016.Job -Sale.Px.Recovery -Sale.Px.Recovery..Msa1. #-Avg..Median.Listing.Price -Region.y -Total.Starts -Avg..Active.Listing.Count
+#          -OwnOccHH2017 -Total.Starts.Recovery..Msa1.
+#          ,data=listing_eco_98_n)
+#summary(fit5_n)
+#vif(fit5_n)
+#```
+
+### At this point no VIF greater than 10
+
+### stepwise
+
+
+
+```{r}
+fit_n_step_forward = step(fit5_n, direction = "forward", trace=FALSE)
+summary(fit_n_step_forward)
+BIC(fit_n_step_forward)
+```
+
+```{r}
+fit_n_step_backward = step(fit5_n, direction = "backward", trace=FALSE)
+summary(fit_n_step_backward)
+BIC(fit_n_step_backward)
+```
+
+
+```{r}
+fit_n_step_both = step(fit5_n, direction = "both", trace=FALSE)
+summary(fit_n_step_both)
+BIC(fit_n_step_both)
 
 ```
 
-... we are pointed to 8 variables.
 
-Running regression once again, with those 8 and storing the results this time
+
 ```{r}
-fit6 <- lm(formula = Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + 
-    End.Of.2016.Household + End.Of.2017.Household + Income.2017 + 
-    Unemployment.Rate.2017 + INC_yoy + BUYPCT_yoy + Sale.Price.Yoy..Msa1., 
-    data = listing_eco_98)
-
-summary(fit6)
+anova(fit_n_step_forward,fit_n_step_backward)
 ```
+
+
+### Now removing BUYPCT_yoy
+
+
+```{r}
+
+fit17_n=lm(Avg..Median.Listing.Price.Yy~ . -RankHH -Region.x -BUYPCT_yoy 
+          #+factor(Region.x)
+,data=listing_eco_98_n)
+#summary(fit5_n)
+#vif(fit5_n)
+
+
+#fit17_n=lm(Avg..Median.Listing.Price.Yy~ . -RankHH -Region.x -End.Of.2017.Household -End.Of.2017.Job #-Income.2017 -Unemployment.Rate.2017 -Buy.Pct.2017
+#          -End.Of.2016.Household -End.Of.2016.Job -Sale.Px.Recovery -Sale.Px.Recovery..Msa1. #-Avg..Median.Listing.Price -Region.y -Total.Starts -Avg..Active.Listing.Count
+#          -OwnOccHH2017 -Total.Starts.Recovery..Msa1.
+#          -BUYPCT_yoy
+#          ,data=listing_eco_98_n)
+summary(fit17_n)
+#vif(fit17_n)
+```
+#```{r}
+#fit_n_step_forward = step(fit17_n, direction = "forward", trace=FALSE)
+#summary(fit_n_step_forward)
+#BIC(fit_n_step_forward)
+#```
+
+```{r}
+fit_n_step_backward = step(fit17_n, direction = "backward", trace=FALSE)
+summary(fit_n_step_backward)
+BIC(fit_n_step_backward)
+```
+
+### Now lets try to remove 2017 variables since we may not have them available
+
+```{r}
+fit18_n=lm(Avg..Median.Listing.Price.Yy~ . -RankHH -Region.x -BUYPCT_yoy 
+           -End.Of.2017.Household -End.Of.2017.Job -Income.2017 -Buy.Pct.2017
+          #+factor(Region.x)
+,data=listing_eco_98_n)
+summary(fit18_n)
+
+fit_n_step_backward = step(fit18_n, direction = "backward", trace=FALSE)
+summary(fit_n_step_backward)
+BIC(fit_n_step_backward)
+```
+
+
 
