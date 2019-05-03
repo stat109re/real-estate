@@ -1,0 +1,707 @@
+---
+title: "RE Project STAT109"
+author: "Javier Vivas"
+date: "5/2/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+
+
+library(seasonal)
+library(seasonalview)
+library(xlsx)
+library(forecast)
+library(ggplot2)
+library(tseries)
+library(ggcorrplot)
+library(BiplotGUI)
+
+library(BHH2)
+library(BSDA)
+library(nortest)
+library(car)
+library(lmtest)
+library(MASS)
+library(R330)
+library(reshape2)
+
+library(leaps)
+library(glmnet)
+library(elasso)
+
+#library(auto)
+
+### START JV Models ###
+
+#1. LOAD, MERGE and FILTER DATA
+
+listing <- read.xlsx("HES_TEMPLATES_v2.xlsx", 1)
+economy <- read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 2, startRow = 1, endRow = 382)
+
+
+View(listing)
+#remove labels from economic data
+economy<-economy[,-c(2:5) ]
+
+#merge
+listing_eco <- merge(listing, economy, by="RankHH")
+
+#View(listing_eco)
+names(economy)
+#View(economy[,5:31])
+
+#Subset data to include largest 100 MSAs only
+#based on the knowledge that size of metropolitan areas has an effect on price growth
+#and listing and economic indicators will be less noisy in the top 100
+mydata=data.frame(listing_eco[1:100,])
+#View(mydata)
+
+
+###2. RUN DESCRIPTIVE STATS
+
+#explore distribution of response variable
+# a few high and low outliers
+boxplot(mydata$Avg..Median.Listing.Price.Yy , 
+     ylab = "Avg..Median.Listing.Price.Yy",
+        main = "Test BoxPlot"
+)
+
+#explore distribution of response variable by region
+#the Midwest region seems to have particularly higher price growth
+boxplot(Avg..Median.Listing.Price.Yy ~Region, data=mydata,
+        ylab = "Avg..Median.Listing.Price.Yy",
+        main = "Test BoxPlot"
+)
+
+#explore correlations 
+
+pairs(mydata[,-c(1:4) ])
+
+matrix<-cor(mydata[,-c(1:4) ])
+
+View(matrix)
+
+plot(matrix)
+
+#export to excel
+#write.xlsx(matrix, "matrix.xlsx")
+
+
+#Create a correlation heatmap
+
+cormat <- round(cor(mydata[,-c(1:4) ]),2)
+melted_cormat <- melt(cormat)
+head(melted_cormat)
+
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + 
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+      geom_tile()
+
+#Get triangles and melt again
+
+# Get lower triangle of the correlation matrix
+get_lower_tri<-function(cormat){
+   cormat[upper.tri(cormat)] <- NA
+   return(cormat)
+}
+# Get upper triangle of the correlation matrix
+get_upper_tri <- function(cormat){
+   cormat[lower.tri(cormat)]<- NA
+   return(cormat)
+}
+
+
+upper_tri <- get_upper_tri(cormat)
+upper_tri
+
+
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+# Heatmap
+ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+   geom_tile(color = "white")+
+   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                        midpoint = 0, limit = c(-1,1), space = "Lab", 
+                        name="Pearson\nCorrelation") +
+   theme_minimal()+ 
+   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                    size = 12, hjust = 1))+
+   coord_fixed()
+
+
+#reorder correlation matrix
+reorder_cormat <- function(cormat){
+   # Use correlation between variables as distance
+   dd <- as.dist((1-cormat)/2)
+   hc <- hclust(dd)
+   cormat <-cormat[hc$order, hc$order]
+}
+
+cormat <- reorder_cormat(cormat)
+upper_tri <- get_upper_tri(cormat)
+# Melt the correlation matrix
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+# Create a ggheatmap
+ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value))+
+   geom_tile(color = "white")+
+   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                        midpoint = 0, limit = c(-1,1), space = "Lab", 
+                        name="Pearson\nCorrelation") +
+   theme_minimal()+ # minimal theme
+   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                    size = 12, hjust = 1))+
+   coord_fixed()
+# Print the heatmap
+print(ggheatmap)
+
+
+#add correlation coefficients on heatmap
+#optional
+# ggheatmap + 
+#    geom_text(aes(Var2, Var1, label = value), color = "black", size = 4) +
+#    theme(
+#       axis.title.x = element_blank(),
+#       axis.title.y = element_blank(),
+#       panel.grid.major = element_blank(),
+#       panel.border = element_blank(),
+#       panel.background = element_blank(),
+#       axis.ticks = element_blank(),
+#       legend.justification = c(1, 0),
+#       legend.position = c(0.6, 0.7),
+#       legend.direction = "horizontal")+
+#    guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+#                                 title.position = "top", title.hjust = 0.5))
+
+
+
+#test normalizing response
+#didn't need this since prof suggested shifting response values
+#x<-mydata$Avg..Median.Listing.Price.Yy
+#scores <- pnorm(x,mean(x),sd(x))
+#mydata_scores<- cbind(mydata,scores)
+#mydata_scores<-mydata
+#View(mydata)
+#names(mydata_scores)
+
+
+###3. INITIAL MODEL EXPLORATION
+
+
+#Filter data based on initial findings
+
+#remove labels
+mydata<-mydata[,-c(1:3) ]
+
+#remove bad explanatory variables based on known multicollinearity and data coverage issues
+mydata<-mydata[,-c(6,13,14,16,18,24,27:36) ]
+
+#shift response values up 0.03 to allow allpossregs to run (based on prof Parzen suggestion)
+mydata$Avg..Median.Listing.Price.Yy=mydata$Avg..Median.Listing.Price.Yy+0.03
+
+
+#run full lm model train data
+
+full.lm=lm(Avg..Median.Listing.Price.Yy ~.
+              , data=mydata)
+
+summary(full.lm)
+
+# RMSE ALL on full data
+
+rmse.full.lm <- sqrt(mean((predict(full.lm,newdata=mydata)-mydata$Avg..Median.Listing.Price.Yy)^2))
+rmse.full.lm
+
+#Run diagnosis 
+
+# do we need transformations?
+# high p value well above 0.05 means model OK, no transformations needed
+resettest(full.lm)
+
+#multicollinearity?
+# not all VIFs below 10 means multicollinearity is still an issue
+vif(full.lm)
+
+#normality?
+#High P-value from the shapiro test well above 0.05 so
+#we fail to reject the null hypo that we have a
+#normal distribution and we are OK
+shapiro.test(resid(full.lm))
+
+#constant variance?
+#High p-value means no issues
+ncvTest(full.lm)
+ncvTest(full.lm)$p
+
+#influential points?
+#some points above Cook threshold, consider removal
+plot(full.lm, which=4)
+cooks.distance(full.lm)>4 / length(cooks.distance(full.lm))
+
+
+
+#TRY ALLPOSSREGS
+
+#With ALL preds
+
+
+#fulldata (before train test split)
+full.apr=allpossregs(Avg..Median.Listing.Price.Yy~.
+                    ,data=mydata ,best=3)   
+
+#CHOOSE one model
+full.apr[28,]
+
+#names(train.data)
+
+#run model 28 on train data
+
+full.apr28=lm(Avg..Median.Listing.Price.Yy ~ 
+                
+                +Avg..Active.Listing.Count.Yy
+             +Avg..Ldpviews.Per.Property
+             + Buy.Pct.2016
+             + HH_yoy
+             +JOB_yoy
+             +OwnOccHH2017
+             +End.Of.2017.Household
+             
+             +Region
+             
+             , data=mydata)
+
+summary(full.apr28)
+
+# RMSE ALL on full data
+
+rmse_apr28_full <- sqrt(mean((predict(full.apr28,newdata=mydata)-mydata$Avg..Median.Listing.Price.Yy)^2))
+rmse_apr28_full
+
+
+#Run diagnosis again on CHOSEN model 28
+
+# do we need transformations?
+# high p value well above 0.05 means model OK, no transformations needed
+resettest(full.apr28)
+
+#multicollinearity?
+# All VIFs below 10 means model OK, no significant multicollinearity
+vif(full.apr28)
+
+#normality?
+#High P-value from the shapiro test well above 0.05 so
+#we fail to reject the null hypo that we have a
+#normal distribution and we are OK
+shapiro.test(resid(full.apr28))
+
+#constant variance?
+#High p-value means no issues
+ncvTest(full.apr28)
+ncvTest(full.apr28)$p
+
+#outliers?
+#Omaha is the most extreme observation based on studentized residuals,
+#but still not an outlier
+outlierTest(full.apr28)
+
+#influential points?
+#some markets above Cook threshold, consider removal
+plot(full.apr28, which=4)
+cooks.distance(full.apr28)>4 / length(cooks.distance(full.apr28))
+
+#remove bad markets based on Cook test
+#New York and Palm Bay metros
+mydata<-mydata[-c(1,89), ]
+
+
+###4. MODEL BUILDING AND TESTING
+
+#SPLIT data into Train and Test
+
+data(mydata)
+set.seed(123)
+sample <- sample.int(n = nrow(mydata),
+                     size = floor(.80*nrow(mydata)), replace = F)
+train.data <- mydata[sample, ]
+test.data <- mydata[-sample, ]
+
+#View(mydata)
+
+
+#Create subset of predictors
+
+train.data.sub <- train.data[,c(1,2,3,7,10,14,15,16,20)]
+test.data.sub <- test.data[,c(1,2,3,7,10,14,15,16,20)]
+
+#TRY ALLPOSSREGS
+
+#With ALL preds
+
+#train
+fit.apr=allpossregs(Avg..Median.Listing.Price.Yy~.
+                 ,data=train.data ,best=3)   
+
+View(fit.apr)
+
+#CHOOSE one model
+fit.apr[28,]
+
+#names(train.data)
+
+#run model 28 on train data
+
+fit.apr28=lm(Avg..Median.Listing.Price.Yy ~ 
+          
+       +Avg..Active.Listing.Count.Yy
+       +Avg..Ldpviews.Per.Property
+       + Buy.Pct.2016
+       + HH_yoy
+       +JOB_yoy
+       +OwnOccHH2017
+      +End.Of.2017.Household
+       
+      +Region
+       
+       , data=train.data)
+
+summary(fit.apr28)
+
+# RMSE ALL on train
+
+rmse_apr28_train <- sqrt(mean((predict(fit.apr28,newdata=train.data)-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_apr28_train
+
+# RMSE ALL on test
+
+rmse_apr28_test <- sqrt(mean((predict(fit.apr28,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_apr28_test
+
+
+#Run diagnosis again on CHOSEN model 28
+
+# do we need transformations?
+# high p value well above 0.05 means model OK, no transformations needed
+resettest(fit.apr28)
+
+#multicollinearity?
+# All VIFs below 10 means model OK, no significant multicollinearity
+vif(fit.apr28)
+
+#normality?
+#P-value from the shapiro test is not high but still well above 0.05 so
+#we fail to reject the null hypo that we have a
+#normal distribution and we are OK
+shapiro.test(resid(fit))
+
+#constant variance?
+#High p-value means no issues
+ncvTest(fit)
+ncvTest(fit)$p
+
+#influential points?
+#some points above Cook threshold, consider removal
+plot(fit, which=4)
+cooks.distance(fit)>4 / length(cooks.distance(fit))
+
+
+
+#Try OLS first
+
+#with ALL predictors
+
+#train
+
+full.ols=lm(Avg..Median.Listing.Price.Yy~.,data=train.data)
+
+summary(full.ols)
+
+#high VIFs above 10 point to multicollinearity on ALL predictors
+vif(full.ols)
+
+#try stepwise on OLS
+fit.ols = step(full.ols, data=train.data, trace=TRUE)
+
+summary(fit.ols)
+
+#All VIFs below 10 once stepwise is applied on ALL predictors
+vif(fit.ols)
+
+## RMSE ALL on train
+
+rmse_fullols_all_train <-  sqrt(mean((predict(full.ols,newdata=train.data)-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fullols_all_train
+
+rmse_fitols_all_train <- sqrt(mean((predict(fit.ols,newdata=train.data)-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitols_all_train
+
+## RMSE ALL on test
+
+sqrt(mean((predict(full.ols,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+
+sqrt(mean((predict(fit.ols,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+
+
+
+
+#with SELECTED predictors
+
+full.ols=lm(Avg..Median.Listing.Price.Yy~.,data=train.data.sub)
+
+summary(full.ols)
+
+fit.ols = step(full.ols, data=train.data.sub, trace=TRUE)
+
+summary(fit.ols)
+
+## RMSE SEL on train
+
+rmse_fullols_sel_train <- sqrt(mean((predict(full.ols,newdata=train.data.sub)-train.data.sub$Avg..Median.Listing.Price.Yy)^2))
+rmse_fullols_sel_train
+
+rmse_fitols_sel_train <- sqrt(mean((predict(fit.ols,newdata=train.data.sub)-train.data.sub$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitols_sel_train
+
+## RMSE SEL on test
+
+rmse_fullols_sel_test <-  sqrt(mean((predict(full.ols,newdata=test.data.sub)-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fullols_sel_test
+
+rmse_fitols_sel_test <- sqrt(mean((predict(fit.ols,newdata=test.data.sub)-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitols_sel_test
+
+
+#with SELECTED predictors and *interactions*
+
+#unfortunately adding interactions results in overfitting. 
+#despite a higher adj R squared, the test RMSE is actually much higher
+#than the train RMSE and higher than the model without interactions
+
+full.ols.inter=lm(Avg..Median.Listing.Price.Yy~.*.,data=train.data.sub)
+
+summary(full.ols.inter)
+
+fit.ols.inter = step(full.ols.inter, data=train.data.sub, trace=TRUE)
+
+summary(fit.ols.inter)
+
+## RMSE SEL on train
+
+rmse_fullolsinter_sel_train <- sqrt(mean((predict(full.ols.inter,newdata=train.data.sub)-train.data.sub$Avg..Median.Listing.Price.Yy)^2))
+rmse_fullolsinter_sel_train
+
+rmse_fitolsinter_sel_train <- sqrt(mean((predict(fit.ols.inter,newdata=train.data.sub)-train.data.sub$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitolsinter_sel_train
+
+## RMSE SEL on test
+
+rmse_fullolsinter_sel_test <-  sqrt(mean((predict(full.ols.inter,newdata=test.data.sub)-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fullolsinter_sel_test
+
+rmse_fitolsinter_sel_test <- sqrt(mean((predict(fit.ols.inter,newdata=test.data.sub)-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitolsinter_sel_test
+
+
+
+#Try RIDGE
+
+
+#train on ALL 
+
+x = model.matrix(Avg..Median.Listing.Price.Yy~.,train.data)[,-1]
+x
+
+y = train.data$Avg..Median.Listing.Price.Yy
+y
+
+cv=cv.glmnet(x,y,alpha=0)
+
+fit.ridge = glmnet(x,y,alpha=0,lambda=cv$lambda.min)
+
+coef(fit.ridge)
+
+#help("glmnet")
+
+#RMSE on ALL train
+
+x.train=model.matrix(Avg..Median.Listing.Price.Yy~.,train.data)
+
+fits = x.train%*%coef(fit.ridge)
+
+rmse_fitridge_all_train <- sqrt(mean((fits-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitridge_all_train
+
+
+#RMSE on ALL test
+
+x.test=model.matrix(Avg..Median.Listing.Price.Yy~.,test.data)
+
+fits = x.test%*%coef(fit.ridge)
+
+rmse_fitridge_all_test <- sqrt(mean((fits-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitridge_all_test
+
+
+#train on SEL
+
+x = model.matrix(Avg..Median.Listing.Price.Yy~.,train.data.sub)[,-1]
+x
+
+y = train.data.sub$Avg..Median.Listing.Price.Yy
+y
+
+cv=cv.glmnet(x,y,alpha=0)
+
+fit.ridge = glmnet(x,y,alpha=0,lambda=cv$lambda.min)
+
+coef(fit.ridge)
+
+
+#RMSE on SEL train
+
+x.train=model.matrix(Avg..Median.Listing.Price.Yy~.,train.data.sub)
+
+fits = x.train%*%coef(fit.ridge)
+
+rmse_fitridge_sel_train <- sqrt(mean((fits-train.data.sub$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitridge_sel_train
+
+#RMSE on SEL test
+
+x.test=model.matrix(Avg..Median.Listing.Price.Yy~.,test.data.sub)
+
+fits = x.test%*%coef(fit.ridge)
+
+rmse_fitridge_sel_test <- sqrt(mean((fits-test.data.sub$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitridge_sel_test
+
+
+#Try LASSO
+
+#train on ALL 
+
+x = model.matrix(Avg..Median.Listing.Price.Yy~.,train.data)[,-1]
+x
+
+y = train.data$Avg..Median.Listing.Price.Yy
+y
+
+cv=cv.glmnet(x,y,alpha=1)
+
+fit.lasso = glmnet(x,y,alpha=1,lambda=cv$lambda.min)
+
+coef(fit.lasso)
+
+#RMSE on ALL train
+
+x.train=model.matrix(Avg..Median.Listing.Price.Yy~.,train.data)
+
+fits = x.train%*%coef(fit.lasso)
+
+rmse_fitlasso_all_train <-  sqrt(mean((fits-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitlasso_all_train
+
+#RMSE on ALL test
+
+x.test=model.matrix(Avg..Median.Listing.Price.Yy~.,test.data)
+
+fits = x.test%*%coef(fit.lasso)
+
+rmse_fitlasso_all_test <- sqrt(mean((fits-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitlasso_all_test
+
+
+#train on SEL
+
+x = model.matrix(Avg..Median.Listing.Price.Yy~.,train.data.sub)[,-1]
+x
+
+y = train.data.sub$Avg..Median.Listing.Price.Yy
+y
+
+cv=cv.glmnet(x,y,alpha=1)
+
+fit.lasso = glmnet(x,y,alpha=1,lambda=cv$lambda.min)
+
+coef(fit.lasso)
+
+
+#RMSE on SEL train
+
+x.train=model.matrix(Avg..Median.Listing.Price.Yy~.,train.data.sub)
+
+fits = x.train%*%coef(fit.lasso)
+
+rmse_fitlasso_sel_train <- sqrt(mean((fits-train.data.sub$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitlasso_sel_train
+
+#RMSE on SEL test
+
+x.test=model.matrix(Avg..Median.Listing.Price.Yy~.,test.data.sub)
+
+fits = x.test%*%coef(fit.lasso)
+
+rmse_fitlasso_sel_test <- sqrt(mean((fits-test.data.sub$Avg..Median.Listing.Price.Yy)^2))
+rmse_fitlasso_sel_test
+
+
+
+### MODEL ASSESSMENT
+# SUMMARIZE TEST RMSEs
+# The lowest RMSE on the test markets is achieved with the rmse_fitridge_sel_test
+# which uses ridge regression on the subset of predictors.
+
+rmse_apr28_test
+
+rmse_fullols_sel_test
+rmse_fitols_sel_test
+
+rmse_fullolsinter_sel_test
+rmse_fitolsinter_sel_test
+
+rmse_fitridge_all_test
+rmse_fitridge_sel_test
+rmse_fitlasso_all_test
+rmse_fitlasso_sel_test
+
+summary_rmses <- cbind(
+rmse_apr28_test,
+rmse_fullols_sel_test,
+rmse_fitols_sel_test,
+rmse_fullolsinter_sel_test,
+rmse_fitolsinter_sel_test,
+rmse_fitridge_all_test,
+rmse_fitridge_sel_test,
+rmse_fitlasso_all_test,
+rmse_fitlasso_sel_test)
+
+
+#######
+
+
+```
+
