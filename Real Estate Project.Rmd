@@ -357,7 +357,7 @@ No heteroskedasticity in this 5th model either.
 vif(fit5)
 ```
 
-Some of the VIFs are definitely above 100, which indicates collinearity in our dataset.
+Some of the VIFs are definitely above 10, which indicates collinearity in our dataset.
 
 
 ---
