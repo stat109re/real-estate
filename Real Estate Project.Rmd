@@ -1,6 +1,8 @@
 ---
-title: "Stats_109_Project"
-output: pdf_document
+title: "Real Estate Project"
+output:
+  pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -8,24 +10,94 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-**Team presentation / names:**
+**Authors: Javier Vivas, Ravi Sharma, Nikat Patel, Evgeny Neashev, Kacper Krasowiak, Jordan Girard**
 
 
 ## Research topic
 
-This research paper is about better understanding the year-on-year (yoy) changes of residential homes prices in the US. The size of the global profesionnaly managed real estate market is about $8.5 trillion, yet property pricing is still a very difficult task. In this paper, we are going to use economic as well as listing data obtained from Realtor.com for fiscal year 2017 in order to provide a pricing model. The ultimate goal of the analysis is to identify variables that could help predict the YoY price change in 2017 the most precisely.
+The size of the global professionally managed real estate market is about $8.5 trillion in 2017. Despite the advancement of the market, yet interpreting property pricing is still a challenging very difficult task.
+
+Usually only socio-economic predictors are used to estimate the supply and demand change on the real estate market. However, the impact of online activity on real estate portals on annual price changes of real estate listings is still not well understood. In this paper, we are going to use socio-economic and listing data obtained from Realtor.com for fiscal year 2017 in order to deriveprovide an alternative-pricing model.
+
+The research is designed to help predict the year-on-year (YoY) price change in 2017. The model would improve the understanding on the dynamic of the real estate market, which potentially could lead to meaningful business and social observations.
+
+## Research Question
+
+This research paper is to better understand the YoY changes of residential homes prices in the United States. The potential impact of socio-economic indicators and online activity on real estate portals on YoY price changes of real estate online listings for single-family residential homes. The goal is to identify variables that could help predict the YoY price change in 2017 the most precisely. 
+
+## Hypothesis
+
+Under the economic conditions of 2017, we expect the number of affordable homes for sale to be the main driver of price growth. Our main hypothesis is higher price growth should occur in markets where inventory supply was low and dropping. Hence, inventory growth YoY and affordability should yield significant explanatory power of price. Another one of our hypotheses is growth in online searches should help tilt the balance into a sellers market and result in higher listing prices. Hence we are predicting that realtor.com page views per listing YoY would also be a significant predictor of price growth.
+
+## Data Collection
+
+The working dataset comes from realtor.com, which is the housing research database, which includes historical aggregated monthly metrics on residential, for-sale listings proprietary to the company along with key economic indicators at market level licensed from third party providers. Listing data comes from a proprietary database that aggregates listing attributes from over 800 Multiple Listing Services (MLSs) data feeds, and produces periodic snapshots of key metrics. The initial analysis will focus on modeling annual snapshots of data for U.S. metropolitan areas in 2016 and 2017 to obtain year-over-year movement. The annual snapshots are equal-weighted averages of the monthly observations of each metric.
+
+
 
 ## Methodology
 
-In order to analyze the relationship amongst the various variables at stake, the research will implement a systematic logic for each analysis. First, stating the initial expectations and assumptions. Second, defining the format, size, unit and source for all data. Third, defining the manipulations and changes to operate on the data including diagnostics. Fourth, explaining the flow of each tentatively built model. Fifth, stating the results. Finally, comparing and contrasting the model’s results to the initial assumption. Based on those, the paper will offer broader conclusions about the single-home residential real estate market in the US.
+In order to analyze the relationship amongst the various variables at stake, the research will implement a systematic eight-step logic for the analysis.
 
-## Initial hypothesis
+\begin{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Load Data}\par}\par
+\begin{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont Load appropriate libraries to work with Excel files\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Load data in R data frames (listings data, economic data)\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Verify: the dimensions, names of the variables, sample rows of data to match with source data codebook\par}\par
+\end{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Identify relevant subset(s) of data for analysis}\par}\par
+\begin{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the appropriate subsets for further analysis\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Create subset data frames in R\par}\par
+\end{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Prepare a summary of individual variables}\par}\par
+\begin{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont Run summary statistics command on each variable of interest\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Create appropriate visual(s) for summary information\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Explain in brief the observations from the summary statistics and the plots\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Identify any next steps due to the occured observations, suspected outliers or others\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Update project documentation - important information in the main section, the other details in Appendix\par}\par
+\end{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Part 1 - Fitting models }\par}\par
+\begin{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all continuous variables (listings data)\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all continuous and categorical variables (listings data)\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Compare the final models with and without categorical variables to see which one is preferable\par}\par
+\end{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Merge datasets}\par}\par
+\begin{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont Using the common column, merge listings and economic datasets\par}\par
+\end{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Part 2 - Fitting models}\par}\par
+\begin{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all continuous variables (economic data)\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all variables from combined listings and economy datasets\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par
+\end{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Test and compare models}\par}\par
+\begin{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont Perform diagnostic tests for all models, check for assumptions\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Look for influential points\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Apply fixes, where required or update/discard models\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Apply bootstrapping where necessary to find out appropriate confidence intervals\par}\par
+	\item {\fontsize{10pt}{12.0pt}\selectfont Use the leading models on the next years data to test real world predictive accuracy of the model\par}\par
+\end{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Conclusion}\par}\par
+\begin{enumerate}
+	\item {\fontsize{10pt}{12.0pt}\selectfont Share the findings and comments\par}
+\end{enumerate}
+\end{enumerate}\par
 
-Under the economic conditions of 2017, we expect the number of residential homes for sale to be the main driver of price growth. Higher price growth should occur in markets where supply was relatively low compared to demand. Hence, inventory growth yoy and possibly affordability should yield significant explanatory of price. Given the data we collected from Realtor.com, one would expect that growth in online research for properties would tilt the balance into sellers and result in higher asking prices. Realtor.com pageviews per listing yoy should be an additional valuable predictor of price.
 
-## Approach to datasets
+
+## Load Data
 
 Our study initiated with two datasets: a) listings data (called listing); and b) economic data (called economy). We will present below the name and nature of each of the variables and explain the meaning of it as needed throughout the analysis.
+
 
 ```{r}
 library(xlsx)
@@ -34,6 +106,8 @@ economy <- read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 2, startRow = 1, endR
 ```
 
 
+## Identify relevant subset(s) of data for analysis
+
 To consider a subset comprising the top 100 ranking metropolitan areas, a smaller dataset is created, as follows:
 
 ```{r}
@@ -41,11 +115,9 @@ listing100 <- data.frame(listing[1:100,])
 dim(listing100)
 ```
 
-We now have 100 rows and 13 vaeriables in our new dataset called listing100.
+We now have 100 rows and 13 vaeriables in our new dataset called listing100. The reason for creating a smaller dataset is [FILL IN].
 
-This will enable us to .....[FILLE IN]
-
-The varibales that we are using are as follows:
+The variables for each of the datasets are:
 
 ```{r}
 names(listing)
@@ -55,13 +127,14 @@ names(listing)
 names(economy)
 ```
 
----
-
 There are 4 regions in our dataset and they are allocated as follows:
 
 ```{r}
 barplot(table(listing100$Region), main = "Regions in top 100 listing centers", xlab="Regions",col="deepskyblue4")
 ```
+
+
+## Prepare a summary of individual variables
 
 We are going to explore each of the variable in more depth:
 
@@ -174,13 +247,15 @@ Now that we have decribed the varibles from the listing dataset, we can start pe
 
 ---
 
+## Part 1 - Fitting models
+
 # STEP 1: LISTING DATA ANALYSIS
 
 ## MODEL 1
 
 We are going to analyze the listing data, followed by the economic data prior to running an analysis on both datasets combined. This will enable us to understand the nature of the variables in each dataset better prior to leading an overall analysis.
 
-The first regression analysis we are going to perform includes all of the non-categorical listing varibales listed above. The model is as follows:
+The first regression analysis we are going to perform includes all of the non-categorical listing variables listed above. The model is as follows:
 
 ```{r}
 fit1 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH , data=listing100)
@@ -188,9 +263,9 @@ fit1 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ld
 summary(fit1)
 ```
 
-*Conclusion about this regression:* It seems that the initial model has a low adjsuted R-squared and that very few varibales are needed other than the intercept, Avg..Active.Listing.Count.Yy and Avg..Median.Listing.Price.
+*Conclusion about this regression:* It seems that the initial model has a low adjusted R-squared and that very few variables are needed other than the intercept, Avg..Active.Listing.Count.Yy and Avg..Median.Listing.Price.
 
-The overall F-test has a vert small p-value which means that at least one variable is going to be needed.
+The overall F-test has a very small p-value which means that at least one variable is going to be needed.
 
 Let's run a few diagnostics to ensure the model has appropriate data. The ncvTest will enable us to test for heteroskedasticity while the VIFs will enable us to test for multicollinearity.
 
@@ -200,13 +275,13 @@ library(car)
 ncvTest(fit1)
 ```
 
-The ncvTest has a very high p-value which indicates that there is no problem os heteroskedasticity, in other terms that the error terms have an equal variance.
+The ncvTest has a very high p-value which indicates that there is no problem of heteroscedasticity, in other terms that the error terms have an equal variance.
 
 ```{r}
 vif(fit1)
 ```
 
-The VIFs are all below a threshold of 10 which enables us to conclude that our data does not have any collinearity issues, which means relationships between the independant variables (the X's).
+The VIFs are all below a threshold of 10 which enables us to conclude that our data does not have any collinearity issues, which means relationships between the independent variables (the X's).
 
 We can therefore more on to other analyses.
 
@@ -214,7 +289,7 @@ We can therefore more on to other analyses.
 
 ## MODEL 2
 
-We are going to run a stepwise regression to imporve our prior model:
+We are going to run a stepwise regression to improve our prior model:
 
 ```{r}
 source("http://people.fas.harvard.edu/~mparzen/stat100/model_select.txt")
@@ -225,7 +300,7 @@ source("http://people.fas.harvard.edu/~mparzen/stat100/model_select.txt")
 model.select(fit1, verbose = FALSE)
 ```
 
-The above model shows us that in the lsiting dataset Avg..Active.Listing.Count.Yy, Avg..Median.Listing.Price and Avg..Median.Dom are the variables the most needed in the model, other than categorical that we have not tested for yet. 
+The above model shows us that in the listing dataset Avg..Active.Listing.Count.Yy, Avg..Median.Listing.Price and Avg..Median.Dom are the variables the most needed in the model, other than categorical that we have not tested for yet. 
 
 ---
 
@@ -236,12 +311,11 @@ If we were to include the categorical variable, region, to the list of predictor
 ```{r}
 fit2 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH + factor(Region) , data=listing100)
 
-summary(fit2)
+summary(fit2, )
 ```
 
-The model 3 shows that by adding the categorical varibales region, the variables needed change and we now need the intercept, Avg..Active.Listing.Count.Yy, factor(Region)Northeast and factor(Region)West . The adjsuted R-squared is higher than model 1 and the SSE is lower, which means that our overall prediction is better.
+The model 3 shows that by adding the categorical variables region, the variables needed change and we now need the intercept, Avg..Active.Listing.Count.Yy, factor(Region)Northeast and factor(Region)West . The adjusted R-squared is higher than model 1 and the SSE is lower, which means that our overall prediction is better.
 
----
 
 ## MODEL 3
 
@@ -250,9 +324,6 @@ We are now going to run stepwise regression again, including the categorical var
 ```{r}
 model.select(fit2, verbose = FALSE)
 ```
-
-
----
 
 Now, let us look at the suggested above predictors individually:
 
@@ -265,13 +336,13 @@ summary(fit3)
 
 
 Scatterplot and regression line
+
 ```{r}
 plot(listing100$Avg..Active.Listing.Count.Yy, listing100$Avg..Median.Listing.Price.Yy)
 abline(fit3, col="deepskyblue4", lwd=3)
 ```
 
 We are going to look at Cook's distance to search for influential points that would bias our models:
-
 
 ```{r}
 plot(fit3,4)
@@ -305,16 +376,8 @@ This 4th model has a slightly improved adjusted R-squared and a slightly better 
 
 **Partial conclusion:** Because we think that not adding the categorical variable into our initial models would be a mistake, we can conclude with confidence that our best model for the listing dataset is model #4.
 
-The nest step in our process is to add the economic variables onto the prior data and create a more refined model with all the data thst we have. After doing this, we are going to make initial conclusions on our findings in order to answer our theoretical question.
+The next step in our process is to add the economic variables onto the prior data and create a more refined model with all the data that we have. After doing this, we are going to make initial conclusions on our findings in order to answer our theoretical question.
 
-
-
-
-
-
-
-
-\newpage
 
 # STEP 2: ALL DATA ANALYSIS
 
@@ -333,7 +396,6 @@ We now have a long list of columns. The list is as follows:
 names(listing_eco_98)
 ```
 
----
 
 ## MODEL 5
 
@@ -357,7 +419,7 @@ No heteroskedasticity in this 5th model either.
 vif(fit5)
 ```
 
-Some of the VIFs are definitely above 10, which indicates collinearity in our dataset.
+Some of the VIFs are definitely above 100, which indicates collinearity in our dataset.
 
 
 ---
@@ -382,13 +444,13 @@ fit6=lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy+Income.2017+
 summary(fit6)
 ```
 
-In comparison to all our prior models, model 6 is by far the model that has the highest adjusted R-squared and the lowest SSE, making it our most reliable model. We are going to run mnore diagnostics on the model 6 to ensure the data we are model respects the four assumptions of linear regression.
+In comparison to all our prior models, model 6 is by far the model that has the highest adjusted R-squared and the lowest SSE, making it our most reliable model. We are going to run more diagnostics on the model 6 to ensure the data we are model respects the four assumptions of linear regression.
 
 ```{r}
 ncvTest(fit6)
 ```
 
-Model 6 does not present any problem of heteroskedasticity.
+Model 6 does not present any problem of heteroscedasticity
 
 ```{r}
 vif(fit6)
@@ -424,9 +486,9 @@ We are here confirming that model 7 also does not present any heteroskedasticity
 
 # CONCLUSION
 
-Our statistical analysis has revelead the 7 variables that explain the average median listing price year over year. The average active listing count year over year is a first variable. It indicates the amount of listings available as a snapshot at a moment in time of the supply of properties for sale. The income for the year is an obvious variable that defines the purchasing power of a household to buy a house. Unemployment rate, a very talked-about metrics in the US at the moment, defines the share of the population without an employment. It goes without saying that the higher the employment rate the greater the share of the population that has access to financial viability to purchase a property as well as getting financing.
+Our statistical analysis has revealed the 7 variables that explain the average median listing price year over year. The average active listing count year over year is a first variable. It indicates the amount of listings available as a snapshot at a moment in time of the supply of properties for sale. The income for the year is an obvious variable that defines the purchasing power of a household to buy a house. Unemployment rate, a very talked-about metrics in the US at the moment, defines the share of the population without an employment. It goes without saying that the higher the employment rate the greater the share of the population that has access to financial viability to purchase a property as well as getting financing.
 
-Our analysis highlighted that, unlike what was thought initially, region (our only categorical variable in the set) does not affect the average median listing price year over year, nor does the number of online views onto Realtor.com website. Our initial assumption was that the most online views, the higher the average median listing price year over year. In fact, we proved that a fair amount of viewership is simply related to looking at real estate in a passive manner as opposed to lookign at real estate solely prior to a purchase.
+Our analysis highlighted that, unlike what was thought initially, region (our only categorical variable in the set) does not affect the average median listing price year over year, nor does the number of online views onto Realtor.com website. Our initial assumption was that most online views, the higher the average median listing price year over year. In fact, we proved that a fair amount of viewership is simply related to looking at real estate in a passive manner as opposed to looking at real estate solely prior to a purchase.
 
 
 
