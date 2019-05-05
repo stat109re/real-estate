@@ -1,0 +1,450 @@
+---
+title: "Stats_109_Project"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+**Team presentation / names:**
+
+
+## Research topic
+
+This research paper is about better understanding the year-on-year (yoy) changes of residential homes prices in the US. The size of the global profesionnaly managed real estate market is about $8.5 trillion, yet property pricing is still a very difficult task. In this paper, we are going to use economic as well as listing data obtained from Realtor.com for fiscal year 2017 in order to provide a pricing model. The ultimate goal of the analysis is to identify variables that could help predict the YoY price change in 2017 the most precisely.
+
+## Methodology
+
+In order to analyze the relationship amongst the various variables at stake, the research will implement a systematic logic for each analysis. First, stating the initial expectations and assumptions. Second, defining the format, size, unit and source for all data. Third, defining the manipulations and changes to operate on the data including diagnostics. Fourth, explaining the flow of each tentatively built model. Fifth, stating the results. Finally, comparing and contrasting the model’s results to the initial assumption. Based on those, the paper will offer broader conclusions about the single-home residential real estate market in the US.
+
+## Initial hypothesis
+
+Under the economic conditions of 2017, we expect the number of residential homes for sale to be the main driver of price growth. Higher price growth should occur in markets where supply was relatively low compared to demand. Hence, inventory growth yoy and possibly affordability should yield significant explanatory of price. Given the data we collected from Realtor.com, one would expect that growth in online research for properties would tilt the balance into sellers and result in higher asking prices. Realtor.com pageviews per listing yoy should be an additional valuable predictor of price.
+
+## Approach to datasets
+
+Our study initiated with two datasets: a) listings data (called listing); and b) economic data (called economy). We will present below the name and nature of each of the variables and explain the meaning of it as needed throughout the analysis.
+
+```{r}
+library(xlsx)
+listing <- read.xlsx("HES_TEMPLATES_v2.xlsx", 1)
+economy <- read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 2, startRow = 1, endRow = 382)
+```
+
+
+To consider a subset comprising the top 100 ranking metropolitan areas, a smaller dataset is created, as follows:
+
+```{r}
+listing100 <- data.frame(listing[1:100,])
+dim(listing100)
+```
+
+We now have 100 rows and 13 vaeriables in our new dataset called listing100.
+
+This will enable us to .....[FILLE IN]
+
+The varibales that we are using are as follows:
+
+```{r}
+names(listing)
+```
+
+```{r}
+names(economy)
+```
+
+---
+
+There are 4 regions in our dataset and they are allocated as follows:
+
+```{r}
+barplot(table(listing100$Region), main = "Regions in top 100 listing centers", xlab="Regions",col="deepskyblue4")
+```
+
+We are going to explore each of the variable in more depth:
+
+### Median.Listing.Price.Yy change:
+
+```{r}
+summary(listing100$Avg..Median.Listing.Price.Yy)
+```
+Visual:
+```{r}
+boxplot(listing100$Avg..Median.Listing.Price.Yy,col="deepskyblue4")
+```
+
+
+### Active.Listing.Count.Yy change:
+
+```{r}
+summary(listing100$Avg..Active.Listing.Count.Yy)
+```
+
+Visual:
+```{r}
+boxplot(listing100$Avg..Active.Listing.Count.Yy,col="deepskyblue4")
+```
+
+### Ldpviews.Per.Property.Yy change:
+
+```{r}
+summary(listing100$Avg..Ldpviews.Per.Property.Yy)
+```
+
+Visual:
+```{r}
+boxplot(listing100$Avg..Ldpviews.Per.Property.Yy,col="deepskyblue4")
+```
+
+
+### Median.Dom.Yy change:
+
+
+```{r}
+summary(listing100$Avg..Median.Dom.Yy)
+```
+
+Visual:
+```{r}
+boxplot(listing100$Avg..Median.Dom.Yy,col="deepskyblue4")
+```
+
+### Median.Listing.Price :
+
+```{r}
+summary(listing100$Avg..Median.Listing.Price)
+```
+
+Visual:
+```{r}
+boxplot(listing100$Avg..Median.Listing.Price,col="deepskyblue4")
+```
+
+
+### Active.Listing.Count :
+
+```{r}
+summary(listing100$Avg..Active.Listing.Count)
+```
+
+Visual:
+```{r}
+boxplot(listing100$Avg..Active.Listing.Count,col="deepskyblue4")
+```
+
+
+### Ldpviews.Per.Property :
+
+```{r}
+summary(listing100$Avg..Ldpviews.Per.Property)
+```
+
+Visual:
+```{r}
+boxplot(listing100$Avg..Ldpviews.Per.Property,col="deepskyblue4")
+```
+
+
+### Median.Dom :
+
+```{r}
+summary(listing100$Avg..Median.Dom)
+```
+
+Visual:
+```{r}
+boxplot(listing100$Avg..Median.Dom,col="deepskyblue4")
+```
+
+
+### ActiveListingsper1000HH :
+
+```{r}
+summary(listing100$Avg.ActiveListingsper1000HH)
+```
+
+Visual:
+```{r}
+boxplot(listing100$Avg.ActiveListingsper1000HH,col="deepskyblue4")
+```
+
+Now that we have decribed the varibles from the listing dataset, we can start performing various models on it.
+
+---
+
+# STEP 1: LISTING DATA ANALYSIS
+
+## MODEL 1
+
+We are going to analyze the listing data, followed by the economic data prior to running an analysis on both datasets combined. This will enable us to understand the nature of the variables in each dataset better prior to leading an overall analysis.
+
+The first regression analysis we are going to perform includes all of the non-categorical listing varibales listed above. The model is as follows:
+
+```{r}
+fit1 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH , data=listing100)
+
+summary(fit1)
+```
+
+*Conclusion about this regression:* It seems that the initial model has a low adjsuted R-squared and that very few varibales are needed other than the intercept, Avg..Active.Listing.Count.Yy and Avg..Median.Listing.Price.
+
+The overall F-test has a vert small p-value which means that at least one variable is going to be needed.
+
+Let's run a few diagnostics to ensure the model has appropriate data. The ncvTest will enable us to test for heteroskedasticity while the VIFs will enable us to test for multicollinearity.
+
+```{r}
+install.packages("car")
+library(car)
+ncvTest(fit1)
+```
+
+The ncvTest has a very high p-value which indicates that there is no problem os heteroskedasticity, in other terms that the error terms have an equal variance.
+
+```{r}
+vif(fit1)
+```
+
+The VIFs are all below a threshold of 10 which enables us to conclude that our data does not have any collinearity issues, which means relationships between the independant variables (the X's).
+
+We can therefore more on to other analyses.
+
+---
+
+## MODEL 2
+
+We are going to run a stepwise regression to imporve our prior model:
+
+```{r}
+source("http://people.fas.harvard.edu/~mparzen/stat100/model_select.txt")
+```
+
+
+```{r}
+model.select(fit1, verbose = FALSE)
+```
+
+The above model shows us that in the lsiting dataset Avg..Active.Listing.Count.Yy, Avg..Median.Listing.Price and Avg..Median.Dom are the variables the most needed in the model, other than categorical that we have not tested for yet. 
+
+---
+
+## MODEL 3
+
+If we were to include the categorical variable, region, to the list of predictors, the new model would be as follows:
+
+```{r}
+fit2 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom + Avg.ActiveListingsper1000HH + factor(Region) , data=listing100)
+
+summary(fit2)
+```
+
+The model 3 shows that by adding the categorical varibales region, the variables needed change and we now need the intercept, Avg..Active.Listing.Count.Yy, factor(Region)Northeast and factor(Region)West . The adjsuted R-squared is higher than model 1 and the SSE is lower, which means that our overall prediction is better.
+
+---
+
+## MODEL 3
+
+We are now going to run stepwise regression again, including the categorical variables:
+
+```{r}
+model.select(fit2, verbose = FALSE)
+```
+
+
+---
+
+Now, let us look at the suggested above predictors individually:
+
+
+```{r}
+fit3 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy, data=listing100)
+
+summary(fit3)
+```
+
+
+Scatterplot and regression line
+```{r}
+plot(listing100$Avg..Active.Listing.Count.Yy, listing100$Avg..Median.Listing.Price.Yy)
+abline(fit3, col="deepskyblue4", lwd=3)
+```
+
+We are going to look at Cook's distance to search for influential points that would bias our models:
+
+
+```{r}
+plot(fit3,4)
+```
+
+Let us list the two longest on Cook's distance:
+```{r}
+listing100[c(31,89),1:4]
+```
+
+Let us remove those two points.
+```{r}
+listing98<-listing100[!(listing100$RankHH == 31 | listing100$RankHH == 89),]
+dim(listing98)
+```
+
+---
+
+## MODEL 4
+
+With a cleaner set of data, we can now run our 4th model:
+
+
+```{r}
+fit4 <- lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy, data=listing98)
+
+summary(fit4)
+```
+
+This 4th model has a slightly improved adjusted R-squared and a slightly better SSE, making it a better model. 
+
+**Partial conclusion:** Because we think that not adding the categorical variable into our initial models would be a mistake, we can conclude with confidence that our best model for the listing dataset is model #4.
+
+The nest step in our process is to add the economic variables onto the prior data and create a more refined model with all the data thst we have. After doing this, we are going to make initial conclusions on our findings in order to answer our theoretical question.
+
+
+
+
+
+
+
+
+\newpage
+
+# STEP 2: ALL DATA ANALYSIS
+
+
+We first need to combine both datasets in order to run further analysis:
+
+
+```{r}
+listing_eco_98 <- merge(listing98, economy, by="RankHH")
+dim(listing_eco_98)
+```
+
+We now have a long list of columns. The list is as follows:
+
+```{r}
+names(listing_eco_98)
+```
+
+---
+
+## MODEL 5
+
+We are going to run regression with all our data.
+
+```{r}
+fit5=lm(Avg..Median.Listing.Price.Yy ~Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom +Region.x+ Avg.ActiveListingsper1000HH+End.Of.2016.Household + End.Of.2017.Household + End.Of.2016.Job + End.Of.2017.Job + Income.2017 + Income.2016 + Unemployment.Rate.2017 + Unemployment.Rate.2016 + Buy.Pct.2017 + Buy.Pct.2016 + HH_yoy + JOB_yoy + INC_yoy + UNEMP_yoy + BUYPCT_yoy + Home.Ownership.2017 + OwnOccHH2017 + Sale.Px.Recovery + Sale.Price.Yoy + Sale.Px.Recovery..Msa1. + Sale.Price.Yoy..Msa1. + Total.Starts + Total.Starts.Recovery + Total.Starts.Yoy  
+ + Total.Starts..Msa1. + Total.Starts.Recovery..Msa1. + Total.Starts.Yoy..Msa1., data = listing_eco_98)
+summary(fit5)
+```
+
+We are going to run some diagnostics, particularly as it relates to heteroskedasticity and multicollinearity:
+
+```{r}
+ncvTest(fit5)
+```
+
+No heteroskedasticity in this 5th model either.
+
+```{r}
+vif(fit5)
+```
+
+Some of the VIFs are definitely above 100, which indicates collinearity in our dataset.
+
+
+---
+
+## MODEL 6
+
+We are going to run a stepwise regression on the prior model to indicate which variables are needed in the model. We can then compare the SSE and adjusted R-squared:
+
+
+```{r}
+model.select(fit5, verbose = FALSE)
+
+```
+
+In this stepwise refression, model 6 indicates that only 8 variables are needed, and are as follows: Avg..Active.Listing.Count.Yy, End.Of.2016.Household, End.Of.2017.Household, Income.2017, Unemployment.Rate.2017, INC_yoy,  BUYPCT_yoy and Sale.Price.Yoy..Msa1
+
+
+We are going to run a final model with only those variables and compare it to model 5.
+
+```{r}
+fit6=lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy+Income.2017+End.Of.2016.Household+End.Of.2017.Household+Unemployment.Rate.2017+INC_yoy+BUYPCT_yoy+Sale.Price.Yoy..Msa1.,data=listing_eco_98)
+summary(fit6)
+```
+
+In comparison to all our prior models, model 6 is by far the model that has the highest adjusted R-squared and the lowest SSE, making it our most reliable model. We are going to run mnore diagnostics on the model 6 to ensure the data we are model respects the four assumptions of linear regression.
+
+```{r}
+ncvTest(fit6)
+```
+
+Model 6 does not present any problem of heteroskedasticity.
+
+```{r}
+vif(fit6)
+```
+
+
+The VIFs analysis highlights that End.Of.2016.Household and End.Of.2017.Household have multicollinearity issues. Therefore, we are going to drop end of 2017 households and use the 2016 data for the purpose of modeling.
+
+---
+
+## MODEL 7
+
+
+```{r}
+fit7=lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy+Income.2017+End.Of.2016.Household+Unemployment.Rate.2017+INC_yoy+BUYPCT_yoy+Sale.Price.Yoy..Msa1.,data=listing_eco_98)
+summary(fit7)
+```
+
+```{r}
+vif(fit7)
+```
+
+
+This model does not have any issues of collinearity anymore. We are going to run the ncvTest one last time to ensure that this model does not have any heteroskedasticity issue either:
+
+
+```{r}
+ncvTest(fit7)
+```
+
+We are here confirming that model 7 also does not present any heteroskedasticity issue.
+
+
+# CONCLUSION
+
+Our statistical analysis has revelead the 7 variables that explain the average median listing price year over year. The average active listing count year over year is a first variable. It indicates the amount of listings available as a snapshot at a moment in time of the supply of properties for sale. The income for the year is an obvious variable that defines the purchasing power of a household to buy a house. Unemployment rate, a very talked-about metrics in the US at the moment, defines the share of the population without an employment. It goes without saying that the higher the employment rate the greater the share of the population that has access to financial viability to purchase a property as well as getting financing.
+
+Our analysis highlighted that, unlike what was thought initially, region (our only categorical variable in the set) does not affect the average median listing price year over year, nor does the number of online views onto Realtor.com website. Our initial assumption was that the most online views, the higher the average median listing price year over year. In fact, we proved that a fair amount of viewership is simply related to looking at real estate in a passive manner as opposed to lookign at real estate solely prior to a purchase.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
