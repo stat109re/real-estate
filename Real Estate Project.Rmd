@@ -39,59 +39,102 @@ The working dataset comes from realtor.com, which is the housing research databa
 
 In order to analyze the relationship amongst the various variables at stake, the research will implement a systematic eight-step logic for the analysis.
 
-\begin{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Load Data}\par}\par
-\begin{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont Load appropriate libraries to work with Excel files\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Load data in R data frames (listings data, economic data)\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Verify: the dimensions, names of the variables, sample rows of data to match with source data codebook\par}\par
-\end{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Identify relevant subset(s) of data for analysis}\par}\par
-\begin{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the appropriate subsets for further analysis\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Create subset data frames in R\par}\par
-\end{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Prepare a summary of individual variables}\par}\par
-\begin{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont Run summary statistics command on each variable of interest\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Create appropriate visual(s) for summary information\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Explain in brief the observations from the summary statistics and the plots\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Identify any next steps due to the occured observations, suspected outliers or others\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Update project documentation - important information in the main section, the other details in Appendix\par}\par
-\end{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Part 1 - Fitting models }\par}\par
-\begin{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all continuous variables (listings data)\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all continuous and categorical variables (listings data)\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Compare the final models with and without categorical variables to see which one is preferable\par}\par
-\end{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Merge datasets}\par}\par
-\begin{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont Using the common column, merge listings and economic datasets\par}\par
-\end{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Part 2 - Fitting models}\par}\par
-\begin{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all continuous variables (economic data)\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all variables from combined listings and economy datasets\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par
-\end{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Test and compare models}\par}\par
-\begin{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont Perform diagnostic tests for all models, check for assumptions\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Look for influential points\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Apply fixes, where required or update/discard models\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Apply bootstrapping where necessary to find out appropriate confidence intervals\par}\par
-	\item {\fontsize{10pt}{12.0pt}\selectfont Use the leading models on the next years data to test real world predictive accuracy of the model\par}\par
-\end{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Conclusion}\par}\par
-\begin{enumerate}
-	\item {\fontsize{10pt}{12.0pt}\selectfont Share the findings and comments\par}
-\end{enumerate}
-\end{enumerate}\par
+<!-- \begin{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Load Data}\par}\par -->
+<!-- \begin{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Load appropriate libraries to work with Excel files\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Load data in R data frames (listings data, economic data)\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Verify: the dimensions, names of the variables, sample rows of data to match with source data codebook\par}\par -->
+<!-- \end{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Identify relevant subset(s) of data for analysis}\par}\par -->
+<!-- \begin{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the appropriate subsets for further analysis\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Create subset data frames in R\par}\par -->
+<!-- \end{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Prepare a summary of individual variables}\par}\par -->
+<!-- \begin{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Run summary statistics command on each variable of interest\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Create appropriate visual(s) for summary information\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Explain in brief the observations from the summary statistics and the plots\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Identify any next steps due to the occured observations, suspected outliers or others\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Update project documentation - important information in the main section, the other details in Appendix\par}\par -->
+<!-- \end{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Part 1 - Fitting models }\par}\par -->
+<!-- \begin{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all continuous variables (listings data)\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all continuous and categorical variables (listings data)\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Compare the final models with and without categorical variables to see which one is preferable\par}\par -->
+<!-- \end{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Merge datasets}\par}\par -->
+<!-- \begin{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Using the common column, merge listings and economic datasets\par}\par -->
+<!-- \end{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Part 2 - Fitting models}\par}\par -->
+<!-- \begin{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all continuous variables (economic data)\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Try a regression with all variables from combined listings and economy datasets\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Identify the variables that are not required, use appropriate techniques to drop those variables\par}\par -->
+<!-- \end{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Test and compare models}\par}\par -->
+<!-- \begin{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Perform diagnostic tests for all models, check for assumptions\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Look for influential points\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Apply fixes, where required or update/discard models\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Apply bootstrapping where necessary to find out appropriate confidence intervals\par}\par -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Use the leading models on the next years data to test real world predictive accuracy of the model\par}\par -->
+<!-- \end{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont \textbf{Conclusion}\par}\par -->
+<!-- \begin{enumerate} -->
+<!-- 	\item {\fontsize{10pt}{12.0pt}\selectfont Share the findings and comments\par} -->
+<!-- \end{enumerate} -->
+<!-- \end{enumerate}\par -->
 
+
+##Load Required Packages
+
+```{r}
+r = getOption("repos")
+r["CRAN"] = "http://cran.us.r-project.org"
+options(repos = r)
+```
+
+
+```{r}
+# install.packages("BHH2", dependencies = TRUE)
+# install.packages("BSDA", dependencies = TRUE)
+# install.packages("nortest", dependencies = TRUE)
+# install.packages("car", dependencies = TRUE)
+# install.packages("lmtest", dependencies = TRUE)
+# install.packages("MASS", dependencies = TRUE)
+# install.packages("R330", dependencies = TRUE)
+# install.packages("leaps", dependencies = TRUE)
+# install.packages("glmnet", dependencies = TRUE)
+# install.packages("elasso", dependencies = TRUE)
+# install.packages("tinytex", dependencies = TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+library(ggcorrplot)
+library(BiplotGUI)
+library(BHH2)
+library(BSDA)
+library(nortest)
+library(car)
+library(lmtest)
+#library(MASS)
+library(R330)
+library(reshape2)
+library(leaps)
+library(glmnet)
+library(elasso)
+library(tinytex)
+library(xlsx)
+```
 
 
 ## Load Data
@@ -100,7 +143,6 @@ Our study initiated with two datasets: a) listings data (called listing); and b)
 
 
 ```{r}
-library(xlsx)
 listing <- read.xlsx("HES_TEMPLATES_v2.xlsx", 1)
 economy <- read.xlsx("HES_TEMPLATES_v2.xlsx", sheetIndex = 2, startRow = 1, endRow = 382)
 ```
@@ -115,7 +157,8 @@ listing100 <- data.frame(listing[1:100,])
 dim(listing100)
 ```
 
-We now have 100 rows and 13 vaeriables in our new dataset called listing100. The reason for creating a smaller dataset is [FILL IN].
+We now have 100 rows and 13 variables in our new dataset called listing100. We subset data to include largest 100 metropolitan areas only
+based on the knowledge that listing and economic indicators will be less noisy in the top 100 and that housing supply and demand dynamics will be more stable in larger cities.
 
 The variables for each of the datasets are:
 
@@ -381,29 +424,88 @@ The next step in our process is to add the economic variables onto the prior dat
 
 # STEP 2: ALL DATA ANALYSIS
 
+We now bring in economic indicators on top of the listing metrics to see if our model can be improved. 
 
-We first need to combine both datasets in order to run further analysis:
+We first need to combine both datasets in order to run further analysis, making sure to remove redundant and incomplete fields from the economic dataset.
 
 
 ```{r}
-listing_eco_98 <- merge(listing98, economy, by="RankHH")
-dim(listing_eco_98)
+#sum(is.na(economy$Sale.Px.Recovery..Msa1.))
+#sum(is.na(economy$Sale.Price.Yoy..Msa1.))
+
+listing_eco_100 <- merge(listing100, economy[,-c(2:5,24:25) ], by="RankHH")
+dim(listing_eco_100)
 ```
 
 We now have a long list of columns. The list is as follows:
 
 ```{r}
-names(listing_eco_98)
+names(listing_eco_100)
 ```
 
+```{r}
+
+#Create a correlation heatmap
+
+cormat <- round(cor(listing_eco_100[,-c(1:4) ]),2)
+melted_cormat <- melt(cormat)
+#head(melted_cormat)
+
+
+
+#Get triangles and melt again
+# Get lower triangle of the correlation matrix
+get_lower_tri<-function(cormat){
+   cormat[upper.tri(cormat)] <- NA
+   return(cormat)
+}
+# Get upper triangle of the correlation matrix
+get_upper_tri <- function(cormat){
+   cormat[lower.tri(cormat)]<- NA
+   return(cormat)
+}
+
+
+upper_tri <- get_upper_tri(cormat)
+#upper_tri
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+
+# Heatmap
+ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+   geom_tile(color = "white")+
+   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                        midpoint = 0, limit = c(-1,1), space = "Lab", 
+                        name="Pearson\nCorrelation") +
+   theme_minimal()+ 
+   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                    size = 12, hjust = 1))+
+   coord_fixed()
+
+# Print the heatmap
+#print(ggheatmap)
+
+
+```
+
+In the bottom row of our correlation heatmap we observe one predictor variable in particular BUYPCT_yoy is potentially problematic as it's highly correlated with the reponse variable Avg..Median.Listing.Price.Yy. Upon further revision of how BUYPCT_yoy is defined in the data, we confirm this predictor should be excluded since Avg..Median.Listing.Price.Yy. is used in the formula for BUYPCT_yoy, and including it would render the model invalid. 
+
+We also observe a few predictors are highly correlated amongst themselves, especially when the same metric is provided for the 2016 and 2017 years as exepected since estimates for these vary little over time. This happens with data for income (Income.2017 and Income.2016), jobs (End.Of.2016.Job and End.Of.2017.Job), unemployment (Unemployment.Rate.2016 and Unemployment.Rate.2017) and affordability (Buy.Pct.2016 and Buy.Pct.2017). Before we exclude, we run further diagnostics to see how to treat these.
+
+Finally, we see how precitors that reflect the size of the market are also correlated. For example, as expected, total households and owner-occupied households (End.Of.2017.Household and OwnOccHH2017) are highly associated with one another. Before we exclude, we run further diagnostics to see how to treat these.  
 
 ## MODEL 5
 
 We are going to run regression with all our data.
 
 ```{r}
-fit5=lm(Avg..Median.Listing.Price.Yy ~Avg..Active.Listing.Count.Yy + Avg..Ldpviews.Per.Property.Yy + Avg..Median.Dom.Yy + Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Ldpviews.Per.Property + Avg..Median.Dom +Region.x+ Avg.ActiveListingsper1000HH+End.Of.2016.Household + End.Of.2017.Household + End.Of.2016.Job + End.Of.2017.Job + Income.2017 + Income.2016 + Unemployment.Rate.2017 + Unemployment.Rate.2016 + Buy.Pct.2017 + Buy.Pct.2016 + HH_yoy + JOB_yoy + INC_yoy + UNEMP_yoy + BUYPCT_yoy + Home.Ownership.2017 + OwnOccHH2017 + Sale.Px.Recovery + Sale.Price.Yoy + Sale.Px.Recovery..Msa1. + Sale.Price.Yoy..Msa1. + Total.Starts + Total.Starts.Recovery + Total.Starts.Yoy  
- + Total.Starts..Msa1. + Total.Starts.Recovery..Msa1. + Total.Starts.Yoy..Msa1., data = listing_eco_98)
+
+listing_eco_100 <- merge(listing100, economy[,-c(2:5,24:25) ], by="RankHH")
+
+#remove predictor which contains the response variable
+names(listing_eco_100)
+listing_eco_100 <- listing_eco_100[,-c(27)]
+
+fit5=lm(Avg..Median.Listing.Price.Yy ~., data = listing_eco_100[,-c(1:3)])
 summary(fit5)
 ```
 
@@ -419,7 +521,60 @@ No heteroskedasticity in this 5th model either.
 vif(fit5)
 ```
 
-Some of the VIFs are definitely above 100, which indicates collinearity in our dataset.
+Many predictors show VIFs above 10, pointing to mutli-collinearity in our dataset confirming the problematic associations we uncovered earlier in the correlation heatmap. We will exclude the 2017 estimates for those household, job, unemployment and affordability measures and leave the 2016 values only.
+
+```{r}
+names(listing_eco_100)
+listing_eco_100 <- listing_eco_100[,-c(16,17,19,21)]
+
+fit5=lm(Avg..Median.Listing.Price.Yy ~., data = listing_eco_100[,-c(1:3)])
+summary(fit5)
+vif(fit5)
+
+```
+Checking VIFs again, End.Of.2017.Household is still the highest above 10. We remove and refit. Running VIFs again shows all are now under 10. 
+
+```{r}
+names(listing_eco_100)
+listing_eco_100 <- listing_eco_100[,-c(14)]
+
+fit5=lm(Avg..Median.Listing.Price.Yy ~., data = listing_eco_100[,-c(1:3)])
+summary(fit5)
+
+#multicollinearity? All VIFs below 10 means model OK, no significant multicollinearity
+vif(fit5)
+```
+
+We then proceed to run full diagnostics.
+
+```{r}
+
+#influential points?
+#some points above Cook threshold, consider removal
+plot(fit5, which=4)
+cooks.distance(fit5)>4 / length(cooks.distance(fit5))
+
+listing_eco_96<-listing_eco_100[-c(1,5,79,95),]
+
+fit5=lm(Avg..Median.Listing.Price.Yy ~., data = listing_eco_96[,-c(1:3)])
+summary(fit5)
+
+#normality?
+#High p-value from the shapiro test is above 0.1 so
+#we fail to reject the null hypo that we have a
+#normal distribution and we are OK
+shapiro.test(resid(fit5))
+
+#constant variance?
+#P-value above 0.05 means no big issues
+ncvTest(fit5)
+ncvTest(fit5)$p
+
+# do we need transformations?
+# high p value well above 0.05 means model OK, no transformations needed
+resettest(fit5)
+
+```
 
 
 ---
@@ -428,84 +583,391 @@ Some of the VIFs are definitely above 100, which indicates collinearity in our d
 
 We are going to run a stepwise regression on the prior model to indicate which variables are needed in the model. We can then compare the SSE and adjusted R-squared:
 
-
 ```{r}
 model.select(fit5, verbose = FALSE)
 
 ```
 
-In this stepwise refression, model 6 indicates that only 8 variables are needed, and are as follows: Avg..Active.Listing.Count.Yy, End.Of.2016.Household, End.Of.2017.Household, Income.2017, Unemployment.Rate.2017, INC_yoy,  BUYPCT_yoy and Sale.Price.Yoy..Msa1
+In this stepwise refression, model 6 indicates that only 8 variables are needed, and are as follows: Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.
 
-
-We are going to run a final model with only those variables and compare it to model 5.
+We run the model 6 based on that input.
 
 ```{r}
-fit6=lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy+Income.2017+End.Of.2016.Household+End.Of.2017.Household+Unemployment.Rate.2017+INC_yoy+BUYPCT_yoy+Sale.Price.Yoy..Msa1.,data=listing_eco_98)
+fit6=lm(Avg..Median.Listing.Price.Yy ~
+          Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.
+,data=listing_eco_96)
+
 summary(fit6)
 ```
 
-In comparison to all our prior models, model 6 is by far the model that has the highest adjusted R-squared and the lowest SSE, making it our most reliable model. We are going to run more diagnostics on the model 6 to ensure the data we are model respects the four assumptions of linear regression.
+In comparison to all our prior models, model 6 has the highest adjusted R-squared and the lowest SSE, making it our most reliable model. Werun more diagnostics to ensure the data we are model respects the four assumptions of linear regression.
 
 ```{r}
+
+#influential points?
+#some points slightly still above Cook threshold, but not too critical
+plot(fit6, which=4)
+cooks.distance(fit6)>4 / length(cooks.distance(fit6))
+
+#normality?
+#High p-value from the shapiro test is above 0.1 so
+#we fail to reject the null hypo that we have a
+#normal distribution and we are OK
+shapiro.test(resid(fit6))
+
+#constant variance?
+#High p-value above 0.05 means no issues
 ncvTest(fit6)
+
+# do we need transformations?
+# p-value just below 0.05 means model may benefit from transformations, but we don't know which ones
+resettest(fit6)
+
 ```
 
-Model 6 does not present any problem of heteroscedasticity
-
-```{r}
-vif(fit6)
-```
-
-
-The VIFs analysis highlights that End.Of.2016.Household and End.Of.2017.Household have multicollinearity issues. Therefore, we are going to drop end of 2017 households and use the 2016 data for the purpose of modeling.
 
 ---
 
 ## MODEL 7
 
+Next we use the step function to choose a model by AIC in a Stepwise Algorithm as an alternative method. This model has an even higher adjusted R-squared and the lowest SSE compared to earlier models. Diagnostics look fine too.
 
 ```{r}
-fit7=lm(Avg..Median.Listing.Price.Yy ~ Avg..Active.Listing.Count.Yy+Income.2017+End.Of.2016.Household+Unemployment.Rate.2017+INC_yoy+BUYPCT_yoy+Sale.Price.Yoy..Msa1.,data=listing_eco_98)
+
+fit7<- step(fit5, data=listing_eco_96, trace=FALSE)
 summary(fit7)
-```
-
-```{r}
-vif(fit7)
-```
 
 
-This model does not have any issues of collinearity anymore. We are going to run the ncvTest one last time to ensure that this model does not have any heteroskedasticity issue either:
+#influential points?
+#some points slightly still above Cook threshold, but not too critical
+plot(fit7, which=4)
+cooks.distance(fit7)>4 / length(cooks.distance(fit7))
 
+#normality?
+#High p-value from the shapiro test is above 0.1 so
+#we fail to reject the null hypo that we have a
+#normal distribution and we are OK
+shapiro.test(resid(fit7))
 
-```{r}
+#constant variance?
+#High p-value above 0.05 means no issues
 ncvTest(fit7)
+
+# do we need transformations?
+# p-value just below 0.05 means model may benefit from transformations, but we don't know which ones
+resettest(fit7)
+
+
 ```
 
-We are here confirming that model 7 also does not present any heteroskedasticity issue.
+---
 
+## VALIDATING AND ASESSING FINAL MODELS
+
+So far we have assessed the models based on the full set but don't know how they behave with test data. Next, we split our dataset into 'Train' and 'Test' subsets, and run procedure on our best models so far to obtain Test RMSEs and compare.
+
+
+```{r}
+data(listing_eco_96)
+set.seed(123)
+sample <- sample.int(n = nrow(listing_eco_96),
+                     size = floor(.80*nrow(listing_eco_96)), replace = F)
+
+train.data <- listing_eco_96[sample, ]
+train.data <- train.data[,-c(1:3)]
+
+test.data <- listing_eco_96[-sample, ]
+test.data <- test.data[,-c(1:3)]
+
+```
+
+Run Train/Test on Model 6
+
+```{r}
+
+fit6_train=lm(Avg..Median.Listing.Price.Yy ~
+          Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.
+,data=train.data)
+
+summary(fit6_train)
+
+# RMSE  on train
+rmse_fit6_train <- sqrt(mean((predict(fit6_train,newdata=train.data)-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit6_train
+
+# RMSE  on test
+rmse_fit6_test <- sqrt(mean((predict(fit6_train,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit6_test
+```
+
+Run Train/Test on Model 7
+
+```{r}
+fit5_train=lm(Avg..Median.Listing.Price.Yy ~., data = train.data)
+
+fit7_train<- step(fit5_train, data=train.data, trace=FALSE)
+summary(fit7_train)
+
+
+# RMSE  on train
+rmse_fit7_train <- sqrt(mean((predict(fit7_train,newdata=train.data)-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit7_train
+
+# RMSE  on test
+rmse_fit7_test <- sqrt(mean((predict(fit7_train,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit7_test
+```
+
+Run Train/Test on Model 8 Ridge
+
+```{r}
+#TRAIN DATA 1
+
+x = model.matrix(Avg..Median.Listing.Price.Yy ~.
+                 ,train.data)[,-1]
+#x
+
+y = train.data$Avg..Median.Listing.Price.Yy
+#y
+
+cv=cv.glmnet(x,y,alpha=0)
+fit8_ridge_train = glmnet(x,y,alpha=0,lambda=cv$lambda.min)
+coef(fit8_ridge_train)
+
+
+#RMSE on ALL train
+
+x.train=model.matrix(Avg..Median.Listing.Price.Yy~.
+                     ,train.data)
+
+fits = x.train%*%coef(fit8_ridge_train)
+
+rmse_fit8_ridge_train <- sqrt(mean((fits-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit8_ridge_train
+
+
+#RMSE on ALL test
+
+x.test=model.matrix(Avg..Median.Listing.Price.Yy~.
+                      ,test.data)
+
+fits = x.test%*%coef(fit8_ridge_train)
+
+rmse_fit8_ridge_test <- sqrt(mean((fits-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit8_ridge_test
+```
+
+We now try to include only a subset of variables from earlier OLS models into the Ridge model to see if it performs better than original Ridge model. And it does.
+
+```{r}
+
+x = model.matrix(Avg..Median.Listing.Price.Yy ~
+                  Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.
+                 ,train.data)[,-1]
+#x
+
+y = train.data$Avg..Median.Listing.Price.Yy
+#y
+
+cv=cv.glmnet(x,y,alpha=0)
+fit8_ridge_train = glmnet(x,y,alpha=0,lambda=cv$lambda.min)
+coef(fit8_ridge_train)
+
+
+#RMSE on ALL train
+
+x.train=model.matrix(Avg..Median.Listing.Price.Yy~
+                      Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.
+                     ,train.data)
+
+fits = x.train%*%coef(fit8_ridge_train)
+
+rmse_fit8_ridge_train <- sqrt(mean((fits-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit8_ridge_train
+
+
+#RMSE on ALL test
+
+x.test=model.matrix(Avg..Median.Listing.Price.Yy~
+                      Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.
+                      ,test.data)
+
+fits = x.test%*%coef(fit8_ridge_train)
+
+rmse_fit8_ridge_test <- sqrt(mean((fits-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit8_ridge_test
+
+
+
+
+```
+
+
+Run Train/Test on Model 9 AllPossRegs. We run all possible regressions method to see if it yields better predictions.
+
+```{r}
+
+###
+
+#TRY ALLPOSSREGS
+
+#train
+
+#shift response values up 0.03 to allow allpossregs to run (based on prof Parzen suggestion)
+train.data.shift<- train.data
+train.data.shift$Avg..Median.Listing.Price.Yy=train.data$Avg..Median.Listing.Price.Yy+0.03
+
+test.data.shift<- test.data
+test.data.shift$Avg..Median.Listing.Price.Yy=test.data$Avg..Median.Listing.Price.Yy+0.03
+
+#fit.apr=allpossregs(Avg..Median.Listing.Price.Yy~.
+              #   ,data=train.data.shift ,best=3)   
+
+#View(fit.apr)
+
+#CHOOSE one model based on highest Adj R2
+#fit.apr[49,]
+
+#run model 49 on train data
+
+fit9=lm(Avg..Median.Listing.Price.Yy ~ 
+      Region
+      + Avg..Active.Listing.Count.Yy +Avg..Ldpviews.Per.Property.Yy +
+           Avg..Median.Dom.Yy   +  Avg..Median.Listing.Price +    Avg..Active.Listing.Count  +  Avg..Ldpviews.Per.Property 
+            +  Avg..Median.Dom  + Avg.ActiveListingsper1000HH    +           End.Of.2016.Job        +           Income.2016 
+     +  Unemployment.Rate.2016          +        Buy.Pct.2016            +            HH_yoy      +                 JOB_yoy 
+                   +   INC_yoy           +          UNEMP_yoy     +      Home.Ownership.2017       +           OwnOccHH2017 
+          +   Sale.Px.Recovery       +         Sale.Price.Yoy         +         Total.Starts        + Total.Starts.Recovery 
+          +   Total.Starts.Yoy       +    Total.Starts..Msa1. + Total.Starts.Recovery..Msa1.     +  Total.Starts.Yoy..Msa1.
+       , data=train.data.shift)
+
+summary(fit9)
+vif(fit9)
+
+# RMSE ALL on train
+
+rmse_fit9_train <- sqrt(mean((predict(fit9,newdata=train.data.shift)-train.data.shift$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit9_train
+
+# RMSE ALL on test
+
+rmse_fit9_test <- sqrt(mean((predict(fit9,newdata=test.data.shift)-test.data.shift$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit9_test
+
+
+```
+
+
+Run Train/Test on Model 10 Lasso
+
+```{r}
+#TRAIN DATA 1
+
+x = model.matrix(Avg..Median.Listing.Price.Yy ~.
+                 ,train.data)[,-1]
+#x
+
+y = train.data$Avg..Median.Listing.Price.Yy
+#y
+
+cv=cv.glmnet(x,y,alpha=1)
+fit10_lasso_train = glmnet(x,y,alpha=1,lambda=cv$lambda.min)
+coef(fit10_lasso_train)
+
+
+#RMSE on ALL train
+
+x.train=model.matrix(Avg..Median.Listing.Price.Yy~.
+                     ,train.data)
+
+fits = x.train%*%coef(fit10_lasso_train)
+
+rmse_fit10_lasso_train <- sqrt(mean((fits-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit10_lasso_train
+
+
+#RMSE on ALL test
+
+x.test=model.matrix(Avg..Median.Listing.Price.Yy~.
+                      ,test.data)
+
+fits = x.test%*%coef(fit10_lasso_train)
+
+rmse_fit10_lasso_test <- sqrt(mean((fits-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit10_lasso_test
+```
+
+We now try to include only a subset of variables from earlier OLS models into the Lasso model to see if it performs better. And it does.
+
+```{r}
+
+x = model.matrix(Avg..Median.Listing.Price.Yy ~Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.
+                 ,train.data)[,-1]
+
+y = train.data$Avg..Median.Listing.Price.Yy
+
+cv=cv.glmnet(x,y,alpha=1)
+
+fit10_lasso_train = glmnet(x,y,alpha=1,lambda=cv$lambda.min)
+coef(fit10_lasso_train)
+
+#RMSE on ALL train
+
+x.train=model.matrix(Avg..Median.Listing.Price.Yy~Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.
+                     ,train.data)
+
+fits = x.train%*%coef(fit10_lasso_train)
+
+rmse_fit10_lasso_train <- sqrt(mean((fits-train.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit10_lasso_train
+
+
+#RMSE on ALL test
+
+x.test=model.matrix(Avg..Median.Listing.Price.Yy~Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.
+                      ,test.data)
+
+fits = x.test%*%coef(fit10_lasso_train)
+
+rmse_fit10_lasso_test <- sqrt(mean((fits-test.data$Avg..Median.Listing.Price.Yy)^2))
+rmse_fit10_lasso_test
+
+```
+
+Finally we compare Test RMSEs across models to find the lowest RMSE and best performing model. Fit 6 seems to yield the lowest RMSE on the test data, followed very closely by fit10. 
+
+```{r}
+#Compare all Test RMSEs
+rmse_fit6_test # model.select on lm
+rmse_fit7_test # step on lm
+rmse_fit8_ridge_test #ridge
+rmse_fit9_test #allpossregs
+rmse_fit10_lasso_test #lasso
+```
+
+Based on the sign of the coefficients from the best performing model Fit6, we find that our response variable Avg..Median.Listing.Price.Yy is influenced by 10 predictors as follows:
+
+- Region: Price growth is fastest in the Midwest region, compared to other regions, followed by the Northeast, then South and West.
+- Avg..Active.Listing.Count.Yy: Lower supply of homes for sale on a yearly basis increases Price Growth.
+- Avg..Median.Listing.Price: Higher priced markets are associated with higher Price Growth.
+- Avg.ActiveListingsper1000HH: Lower supply of homes for sale relative to the number of households in the market also leads to higher Price Growth.
+- Income.2016: Lower absolute household income is associated with higher price growth.
+-Buy.Pct.2016: Lower percentage of income required to buy a home (and hence higher affordability) is also associated with higher Price Growth.
+- HH_yoy: Household growth on a yearly basis is associated with higher Price Growth.
+- JOB_yoy: Growth in job creation on a yearly basis is associated with higher Price Growth.
+- INC_yoy: Slower growth in household income on a yearly basis is associated with higher Price Growth.
+- Total.Starts..Msa1.: Growth in New Construction is associated with higher Price Growth.
+
+```{r}
+summary(fit6_train)
+
+```
 
 # CONCLUSION
 
 Our statistical analysis has revealed the 7 variables that explain the average median listing price year over year. The average active listing count year over year is a first variable. It indicates the amount of listings available as a snapshot at a moment in time of the supply of properties for sale. The income for the year is an obvious variable that defines the purchasing power of a household to buy a house. Unemployment rate, a very talked-about metrics in the US at the moment, defines the share of the population without an employment. It goes without saying that the higher the employment rate the greater the share of the population that has access to financial viability to purchase a property as well as getting financing.
 
 Our analysis highlighted that, unlike what was thought initially, region (our only categorical variable in the set) does not affect the average median listing price year over year, nor does the number of online views onto Realtor.com website. Our initial assumption was that most online views, the higher the average median listing price year over year. In fact, we proved that a fair amount of viewership is simply related to looking at real estate in a passive manner as opposed to looking at real estate solely prior to a purchase.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
