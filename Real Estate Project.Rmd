@@ -113,14 +113,14 @@ options(repos = r)
 # install.packages("leaps", dependencies = TRUE)
 # install.packages("glmnet", dependencies = TRUE)
 # install.packages("elasso", dependencies = TRUE)
-# install.packages("tinytex", dependencies = TRUE)
+#install.packages("tinytex", dependencies = TRUE)
 ```
 
 
 ```{r}
 library(ggplot2)
 library(ggcorrplot)
-library(BiplotGUI)
+#library(BiplotGUI)
 library(BHH2)
 library(BSDA)
 library(nortest)
@@ -313,7 +313,7 @@ The overall F-test has a very small p-value which means that at least one variab
 Let's run a few diagnostics to ensure the model has appropriate data. The ncvTest will enable us to test for heteroskedasticity while the VIFs will enable us to test for multicollinearity.
 
 ```{r}
-install.packages("car")
+#install.packages("car")
 library(car)
 ncvTest(fit1)
 ```
@@ -368,7 +368,7 @@ We are now going to run stepwise regression again, including the categorical var
 model.select(fit2, verbose = FALSE)
 ```
 
-Now, let us look at the suggested above predictors individually:
+Now, let us look at one of the suggested above predictors individually - this would be Avg..Active.Listing.Count.Yy as it shows up in all the suggested models:
 
 
 ```{r}
@@ -668,7 +668,7 @@ So far we have assessed the models based on the full set but don't know how they
 
 
 ```{r}
-data(listing_eco_96)
+#data(listing_eco_96)
 set.seed(123)
 sample <- sample.int(n = nrow(listing_eco_96),
                      size = floor(.80*nrow(listing_eco_96)), replace = F)
@@ -934,7 +934,7 @@ rmse_fit10_lasso_test
 
 ```
 
-Finally we compare Test RMSEs across models to find the lowest RMSE and best performing model. Fit 6 seems to yield the lowest RMSE on the test data, followed very closely by fit10. 
+Now, we compare Test RMSEs across models to find the lowest RMSE and best performing model. Fit 6 seems to yield the lowest RMSE on the test data, followed very closely by fit10. 
 
 ```{r}
 #Compare all Test RMSEs
@@ -944,6 +944,79 @@ rmse_fit8_ridge_test #ridge
 rmse_fit9_test #allpossregs
 rmse_fit10_lasso_test #lasso
 ```
+Finally, repeat the Train/Test evaluations a 1000 times for each of the 5 models - to compare even better.
+
+```{r}
+nsim=1000
+seed_counter = 100
+rmse_fit6=1:nsim
+rmse_fit7=1:nsim
+rmse_fit8=1:nsim
+rmse_fit9=1:nsim
+rmse_fit10=1:nsim
+
+for(i in 1:nsim){
+  # for repeatability, we use seed but with incremental value for each of the 1000 simulations
+  set.seed(seed_counter)
+  seed_counter = seed_counter + 1
+  
+  sample <- sample.int(n = nrow(listing_eco_96),
+                     size = floor(.80*nrow(listing_eco_96)), replace = F)
+  train.data <- listing_eco_96[sample, ]
+  test.data <- listing_eco_96[-sample, ]
+
+  fit6 =lm(Avg..Median.Listing.Price.Yy ~
+          Region +  Avg..Active.Listing.Count.Yy   +  Avg..Median.Listing.Price  + Avg.ActiveListingsper1000HH  + 
+            Income.2016 + Buy.Pct.2016 + HH_yoy  +  JOB_yoy +  INC_yoy  + Total.Starts..Msa1.,data=train.data)
+  rmse_fit6[i]=sqrt(mean((predict(fit6,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+
+  
+  fit7 = lm(formula = Avg..Median.Listing.Price.Yy ~ Region + Avg..Active.Listing.Count.Yy + 
+    Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Median.Dom + 
+    Avg.ActiveListingsper1000HH + Income.2016 + Buy.Pct.2016 + 
+    HH_yoy + JOB_yoy + INC_yoy + OwnOccHH2017 + Total.Starts + 
+    Total.Starts.Yoy + Total.Starts..Msa1. + Total.Starts.Yoy..Msa1., 
+    data = train.data)
+  rmse_fit7[i]=sqrt(mean((predict(fit7,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+
+  fit8 = lm(formula = Avg..Median.Listing.Price.Yy ~ Region + Avg..Active.Listing.Count.Yy + 
+    Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Median.Dom + 
+    Avg.ActiveListingsper1000HH + Income.2016 + Buy.Pct.2016 + 
+    HH_yoy + JOB_yoy + INC_yoy + OwnOccHH2017 + Total.Starts + 
+    Total.Starts.Yoy + Total.Starts..Msa1. + Total.Starts.Yoy..Msa1., 
+    data = train.data)
+  rmse_fit8[i]=sqrt(mean((predict(fit8,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+  
+  fit9 = lm(formula = Avg..Median.Listing.Price.Yy ~ Region + Avg..Active.Listing.Count.Yy + 
+    Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Median.Dom + 
+    Avg.ActiveListingsper1000HH + Income.2016 + Buy.Pct.2016 + 
+    HH_yoy + JOB_yoy + INC_yoy + OwnOccHH2017 + Total.Starts + 
+    Total.Starts.Yoy + Total.Starts..Msa1. + Total.Starts.Yoy..Msa1., 
+    data = train.data)
+  rmse_fit9[i]=sqrt(mean((predict(fit9,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+  
+  fit10 = lm(formula = Avg..Median.Listing.Price.Yy ~ Region + Avg..Active.Listing.Count.Yy + 
+    Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Median.Dom + 
+    Avg.ActiveListingsper1000HH + Income.2016 + Buy.Pct.2016 + 
+    HH_yoy + JOB_yoy + INC_yoy + OwnOccHH2017 + Total.Starts + 
+    Total.Starts.Yoy + Total.Starts..Msa1. + Total.Starts.Yoy..Msa1., 
+    data = train.data)
+  rmse_fit10[i]=sqrt(mean((predict(fit10,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+}
+```
+
+Now let us compare the means of RMSE from 1000 train/test evaluations:
+```{r}
+mean(rmse_fit6)
+mean(rmse_fit7)
+mean(rmse_fit8)
+mean(rmse_fit9)
+mean(rmse_fit10)
+
+```
+
+
+
 
 Based on the sign of the coefficients from the best performing model Fit6, we find that our response variable Avg..Median.Listing.Price.Yy is influenced by 10 predictors as follows:
 
