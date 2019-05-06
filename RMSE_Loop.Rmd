@@ -1,0 +1,30 @@
+---
+title: "RMSE_Loop"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(car)
+mydata=read.csv("http://www.datadescant.com/stat104/cars10.csv")
+nsim=1000
+rmse=1:nsim
+for(i in 1:nsim){
+  sample <- sample.int(n = nrow(mydata),
+                     size = floor(.80*nrow(mydata)), replace = F)
+  train.data <- mydata[sample, ]
+  test.data <- mydata[-sample, ]
+
+  fit=lm(price~mpg+turn+length,data=train.data)
+  rmse[i]=sqrt(mean((predict(fit,newdata=test.data)-test.data$price)^2))
+
+}
+
+hist(rmse)
+print(mean(rmse))
+
+```
+
