@@ -1040,27 +1040,25 @@ for(i in 1:nsim){
    fits = x.test%*%coef(fit8_ridge_train)
    rmse_fit8[i] <- sqrt(mean((fits-test.data$Avg..Median.Listing.Price.Yy)^2))
 #model 9 - All Possible Regressions - MISSING
+   train.data.shift<- train.data
+   train.data.shift$Avg..Median.Listing.Price.Yy=train.data$Avg..Median.Listing.Price.Yy+0.03
 
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-#  fit9 = lm(formula = Avg..Median.Listing.Price.Yy ~ Region + Avg..Active.Listing.Count.Yy + 
-#    Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Median.Dom + 
-#    Avg.ActiveListingsper1000HH + Income.2016 + Buy.Pct.2016 + 
-#    HH_yoy + JOB_yoy + INC_yoy + OwnOccHH2017 + Total.Starts + 
-#    Total.Starts.Yoy + Total.Starts..Msa1. + Total.Starts.Yoy..Msa1., 
-#    data = train.data)
-#  rmse_fit9[i]=sqrt(mean((predict(fit9,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+   test.data.shift<- test.data
+   test.data.shift$Avg..Median.Listing.Price.Yy=test.data$Avg..Median.Listing.Price.Yy+0.03
+
+
+   fit9=lm(Avg..Median.Listing.Price.Yy ~ Region + Avg..Active.Listing.Count.Yy +Avg..Ldpviews.Per.Property.Yy +
+           Avg..Median.Dom.Yy   +  Avg..Median.Listing.Price +    Avg..Active.Listing.Count  +  Avg..Ldpviews.Per.Property 
+            +  Avg..Median.Dom  + Avg.ActiveListingsper1000HH    +           End.Of.2016.Job        +           Income.2016 
+     +  Unemployment.Rate.2016          +        Buy.Pct.2016            +            HH_yoy      +                 JOB_yoy 
+                   +   INC_yoy           +          UNEMP_yoy     +      Home.Ownership.2017       +           OwnOccHH2017 
+          +   Sale.Px.Recovery       +         Sale.Price.Yoy         +         Total.Starts        + Total.Starts.Recovery 
+          +   Total.Starts.Yoy       +    Total.Starts..Msa1. + Total.Starts.Recovery..Msa1.     +  Total.Starts.Yoy..Msa1.
+       , data=train.data.shift)
+
+
+   rmse_fit9[i] <- sqrt(mean((predict(fit9,newdata=test.data.shift)-test.data.shift$Avg..Median.Listing.Price.Yy)^2))
+
 #model 10  - Lasso  - MISSING
   fit10 = lm(formula = Avg..Median.Listing.Price.Yy ~ Region + Avg..Active.Listing.Count.Yy + 
     Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Median.Dom + 
