@@ -1060,13 +1060,17 @@ for(i in 1:nsim){
    rmse_fit9[i] <- sqrt(mean((predict(fit9,newdata=test.data.shift)-test.data.shift$Avg..Median.Listing.Price.Yy)^2))
 
 #model 10  - Lasso  - MISSING
-  fit10 = lm(formula = Avg..Median.Listing.Price.Yy ~ Region + Avg..Active.Listing.Count.Yy + 
-    Avg..Median.Listing.Price + Avg..Active.Listing.Count + Avg..Median.Dom + 
-    Avg.ActiveListingsper1000HH + Income.2016 + Buy.Pct.2016 + 
-    HH_yoy + JOB_yoy + INC_yoy + OwnOccHH2017 + Total.Starts + 
-    Total.Starts.Yoy + Total.Starts..Msa1. + Total.Starts.Yoy..Msa1., 
-    data = train.data)
-  rmse_fit10[i]=sqrt(mean((predict(fit10,newdata=test.data)-test.data$Avg..Median.Listing.Price.Yy)^2))
+   
+   x = model.matrix(Avg..Median.Listing.Price.Yy ~. ,train.data)[,-1]
+   y = train.data$Avg..Median.Listing.Price.Yy
+
+   cv=cv.glmnet(x,y,alpha=1)
+   fit10_lasso_train = glmnet(x,y,alpha=1,lambda=cv$lambda.min)
+   x.test=model.matrix(Avg..Median.Listing.Price.Yy~.,test.data)
+   fits = x.test%*%coef(fit10_lasso_train)
+
+   rmse_fit10[i] <- sqrt(mean((fits-test.data$Avg..Median.Listing.Price.Yy)^2))
+
 }
 ```
 
